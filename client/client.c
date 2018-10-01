@@ -50,8 +50,15 @@ static int get_line_from_user(char *buff, size_t buff_length)
     return 1;
 }
 
+static void print_commands() {
+    printf("Available commands:\n");
+    printf("/getusers - Get list of conneted users\n");
+    printf("/quit - Disconnect from server\n");
+    printf("@<username> - PM a user\n");
+}
 static void cmd_loop(int sock_fd)
 {
+    print_commands();
     while (1)
     {
         char        buffer[256];
@@ -60,12 +67,11 @@ static void cmd_loop(int sock_fd)
         {
             printf("Unable to handle input.\n");
         }
-        printf("Got buffer %s\n", buffer);
-        if (strcmp(buffer, "quit") == 0)
+        // disconect from the server
+        if (strcmp(buffer, "/quit") == 0)
         {
             printf("Goodbye!\n");
             g_is_alive = 0;
-            // disconect from the server
             status = proto_disconnect_from_server(sock_fd,
                                                   "user initiated disconnect");
             if (status != OK)
@@ -79,7 +85,8 @@ static void cmd_loop(int sock_fd)
             printf("Joined receive thread, terminating cmd loop\n");
             break;
         }
-        if (strcmp(buffer, "getlist") == 0)
+        // get a list of users connected to the server
+        if (strcmp(buffer, "/getusers") == 0)
         {
             printf("Requesting user list from server\n");
             status = proto_request_userlist_from_server(sock_fd);
