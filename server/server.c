@@ -266,6 +266,7 @@ int main(int argc, char *argv[])
                     g_client_sockets[i] = 0;
                     connected_clients--;
                     close(sd);
+                    list_remove(active_user_list, user);
                     continue;
                 }
                 else if (cmd->command_type == CMD_REQUEST_USERLIST_FROM_SERVER)
