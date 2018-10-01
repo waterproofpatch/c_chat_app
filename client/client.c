@@ -183,6 +183,13 @@ void *receive_function(void *context)
                 cmd->payload);
             break;
         }
+        else if (cmd->command_type == CMD_USER_LIST) {
+            name_list_t* name_list = (name_list_t*)cmd->payload;
+            printf("%d users connected:\n", name_list->num_names);
+            for (int i = 0; i < name_list->num_names; i++) {
+                printf("Name: [%s]\n", name_list->usernames[i]);
+            }
+        }
     }
     printf("Receive thread terminating.\n");
     return NULL;

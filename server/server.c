@@ -13,7 +13,6 @@
 #include "protocol.h"
 #include "server.h"
 
-#define MAX_CLIENTS 10
 
 proto_err_t create_server(unsigned short port_no, int *sock_fd_out);
 
@@ -153,6 +152,7 @@ int main(int argc, char *argv[])
         {
             printf("Select error\n");
         }
+
         // if the activity was on our listening socket, it's a new connection'
         if (FD_ISSET(sock_fd, &readfds))
         {
@@ -273,6 +273,7 @@ int main(int argc, char *argv[])
                 {
                     printf("User [%s] requests user list from server...\n",
                            user->name);
+                    proto_send_user_list(sd, active_user_list);
                 }
                 else
                 {

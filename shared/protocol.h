@@ -3,7 +3,10 @@
 
 #include <stdlib.h>
 #include "user.h"
+#include "list.h"
 #include "error_codes.h"
+
+#define MAX_CLIENTS 10
 
 #define CMD_MAX_PAYLOAD_LENGTH \
     256   // the maximum length allowed for any command payload
@@ -14,6 +17,7 @@
     RENDER(CMD_REQUEST_DISCONNECT)           \
     RENDER(CMD_RESPONSE_NAME)                \
     RENDER(CMD_REQUEST_USERLIST_FROM_SERVER) \
+    RENDER(CMD_USER_LIST) \
     RENDER(CMD_PADDING = 0xffffffff)
 
 #define GENERATE_ENUM(ENUM) ENUM,
@@ -35,6 +39,12 @@ typedef struct _command_t
     char           payload[0];
 } command_t;
 
+// hold a list of usernames for sending from server to client
+typedef struct _name_list_t {
+    int num_names;
+    char usernames[MAX_CLIENTS][MAX_USER_NAME_LENGTH];
+} name_list_t;
+
 /**
  * @brief handle reading a command
  * @param sock_fd: the socket to read the command from
@@ -49,6 +59,18 @@ proto_err_t proto_request_client_name(int sock_fd);
 proto_err_t proto_read_client_name(int sock_fd, char **name_out);
 proto_err_t proto_send_client_name(int sock_fd, char *name, size_t name_length);
 proto_err_t proto_request_userlist_from_server(int sock_fd);
+
+/**
+ * @brief send the list of connected users to the remote end
+ * @param sock_fd: the file descriptor to which to send the list of users
+ * @param user_list: the list of users
+ * */
+proto_err_t proto_send_user_list(int sock_fd, list_t* user_list);
+
+/**
+ * @brief print the command (human readable)
+ * @param command: the command to print
+ * */
 void        proto_print_command(command_t *command);
 
 #endif   // __PROTOCOL_H_
