@@ -233,6 +233,7 @@ int main(int argc, char *argv[])
         // otherwise we have client activity
         for (i = 0; i < MAX_CLIENTS; i++)
         {
+            printf("we have client activity\n");
             int sd = g_client_sockets[i];
             if (FD_ISSET(sd, &readfds))
             {
