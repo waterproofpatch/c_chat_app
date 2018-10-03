@@ -13,12 +13,18 @@
 #include "protocol.h"
 #include "server.h"
 
-proto_err_t create_server(unsigned short port_no, int *sock_fd_out);
+/**
+ * @brief create a server
+ * @param port_no: the port to listen on
+ * @param sock_fd_out: ptr to socket to write with created server socket
+ * @return: OK if server socket created successfully, ERR_* otherwise. See
+ * error_codes.h.
+ * */
+static proto_err_t create_server(unsigned short port_no, int *sock_fd_out);
 
-pthread_t g_client_handler_thread;
+pthread_t g_client_handler_thread;   // TODO unused
 int       g_client_sockets[MAX_CLIENTS];
 fd_set    g_all_fds;
-int       g_max_fd = 0;
 
 char server_client_socket_fd_comparator(void *context, void *key)
 {
@@ -167,6 +173,7 @@ proto_err_t process_new_client(int server_sock_fd, list_t *active_user_list)
     server_add_client_socket(new_user->client_socket_fd);
     // set the file descriptor
     FD_SET(new_user->client_socket_fd, &g_all_fds);
+    status = OK;
 done:
     if (status != OK)
     {
@@ -174,17 +181,6 @@ done:
         FD_CLR(new_sock_fd, &g_all_fds);
     }
 
-    // calculate new max fd
-    for (int i = 0; i < MAX_CLIENTS; i++)
-    {
-        if (g_client_sockets[i] > 0)
-        {
-            if (FD_ISSET(g_client_sockets[i], &g_all_fds))
-            {
-                g_max_fd = MAX(g_max_fd, g_client_sockets[i]);
-            }
-        }
-    }
     return status;
 }
 
@@ -220,12 +216,12 @@ int main(int argc, char *argv[])
 
     FD_ZERO(&g_all_fds);
     FD_SET(server_sock_fd, &g_all_fds);
-    g_max_fd = server_sock_fd;
 
     while (1)
     {
         printf("blocking on select\n");
-        int activity = select(g_max_fd + 1, &g_all_fds, NULL, NULL, NULL);
+        // int activity = select(g_max_fd + 1, &g_all_fds, NULL, NULL, NULL);
+        int activity = select(FD_SETSIZE, &g_all_fds, NULL, NULL, NULL);
         printf("done blocking on select\n");
         if (activity < 0 && errno != EINTR)
         {
