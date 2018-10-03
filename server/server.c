@@ -13,11 +13,11 @@
 #include "protocol.h"
 #include "server.h"
 
-
 proto_err_t create_server(unsigned short port_no, int *sock_fd_out);
 
 pthread_t g_client_handler_thread;
 int       g_client_sockets[MAX_CLIENTS];
+fd_set    g_all_fds;
 
 char server_client_socket_fd_comparator(void *context, void *key)
 {
@@ -32,7 +32,6 @@ void server_init_client_sockets()
     for (i = 0; i < MAX_CLIENTS; i++)
     {
         g_client_sockets[i] = 0;
-        return;
     }
 }
 
@@ -44,9 +43,9 @@ void server_add_client_socket(int socket_fd)
         if (g_client_sockets[i] == 0)
         {
             g_client_sockets[i] = socket_fd;
-            return;
+            FD_SET(socket_fd, &g_all_fds);
+            break;
         }
-        return;
     }
 }
 void *server_handle_client_thread(void *context)
@@ -95,17 +94,88 @@ proto_err_t create_server(unsigned short port_no, int *sock_fd_out)
     *sock_fd_out = sock_fd;
     return OK;
 }
+
+proto_err_t process_new_client(int server_sock_fd, list_t *active_user_list)
+{
+    proto_err_t        status         = OK;
+    socklen_t          client_length  = sizeof(struct sockaddr_in);
+    struct sockaddr_in client_address = {0};
+    int                new_sock_fd    = 0;
+
+    new_sock_fd = accept(server_sock_fd, (struct sockaddr *)&client_address,
+                         &client_length);
+    if (new_sock_fd < 0)
+    {
+        printf("ERROR on accept\n");
+        return ERR_NETWORK_FAILURE;
+    }
+    printf("Got a new client, asking for name!\n");
+
+    // ask the client for their name
+    status = proto_request_client_name(new_sock_fd);
+    if (status != OK)
+    {
+        printf("Unable to request client name: %s\n",
+               PROTO_ERR_T_STRING[status]);
+        return ERR_GENERAL;
+    }
+
+    // get the name from the client
+    char *name_out = NULL;
+    status         = proto_read_client_name(new_sock_fd, &name_out);
+    if (status != OK)
+    {
+        printf("Unable to read client name: %s\n", PROTO_ERR_T_STRING[status]);
+        status = proto_disconnect_client(new_sock_fd, "invalid client name");
+        if (status != OK)
+        {
+            printf("Unable to disconnect client: %s\n",
+                   PROTO_ERR_T_STRING[status]);
+            return status;
+        }
+        return ERR_GENERAL;
+    }
+
+    printf("Adding a user!\n");
+    user_t *new_user = malloc(sizeof(user_t));
+    if (!new_user)
+    {
+        printf("Unable to allocate a user\n");
+        free(name_out);
+        return ERR_NO_MEM;
+    }
+    memset(new_user->name, '\0', MAX_USER_NAME_LENGTH);
+    new_user->client_socket_fd = new_sock_fd;
+    memcpy(new_user->name, name_out, strlen(name_out));
+    free(name_out);
+    user_t *existing_user = (user_t *)list_search(
+        active_user_list, user_comparator, new_user->name);
+    if (existing_user)
+    {
+        printf("User with name %s already exists, kicking\n", new_user->name);
+        status =
+            proto_disconnect_client(new_sock_fd, "username already exists");
+        if (status != OK)
+        {
+            printf("Unable to kick user: %s\n", PROTO_ERR_T_STRING[status]);
+        }
+        free(new_user);
+        return ERR_GENERAL;
+    }
+
+    list_add(active_user_list, new_user);
+    printf("Added user %s to active user list.\n", new_user->name);
+    server_add_client_socket(new_user->client_socket_fd);
+    return OK;
+}
+
 int main(int argc, char *argv[])
 {
     // we'll listen on a high port to avoid having to sudo
-    proto_err_t        status = OK;
-    fd_set             readfds;   // set of file descriptors
-    int                max_fd;
-    int                sock_fd          = 0;
-    socklen_t          client_length    = sizeof(struct sockaddr_in);
-    unsigned short     port_no          = 5001;
-    struct sockaddr_in client_address   = {0};
-    list_t *           active_user_list = 0;
+    proto_err_t    status           = OK;
+    int            server_sock_fd   = 0;
+    unsigned short port_no          = 5001;
+    list_t *       active_user_list = 0;
 
     // init the socket set for the clients
     server_init_client_sockets();
@@ -116,7 +186,7 @@ int main(int argc, char *argv[])
 
     // create the server
     printf("server running on port %d\n", port_no);
-    status = create_server(port_no, &sock_fd);
+    status = create_server(port_no, &server_sock_fd);
     if (status != OK)
     {
         printf("Unable to create server: %s\n", PROTO_ERR_T_STRING[status]);
@@ -128,161 +198,86 @@ int main(int argc, char *argv[])
 
     // wait for a client to connect
     int connected_clients = 0;
+
+    FD_ZERO(&g_all_fds);
+    FD_SET(server_sock_fd, &g_all_fds);
+
     while (connected_clients < MAX_CLIENTS)
     {
-        FD_ZERO(&readfds);
-        FD_SET(sock_fd, &readfds);
-        max_fd = sock_fd;
-        int i;
-        for (i = 0; i < MAX_CLIENTS; i++)
-        {
-            int sd = g_client_sockets[i];
-            if (sd > 0)
-            {
-                FD_SET(sd, &readfds);
-                if (sd > max_fd)
-                {
-                    max_fd = sd;
-                }
-            }
-        }
-
-        int activity = select(max_fd + 1, &readfds, NULL, NULL, NULL);
+        printf("blocking on select\n");
+        int activity = select(MAX_CLIENTS, &g_all_fds, NULL, NULL, NULL);
+        printf("done blocking on select\n");
         if (activity < 0 && errno != EINTR)
         {
             printf("Select error\n");
+            continue;
         }
 
         // if the activity was on our listening socket, it's a new connection'
-        if (FD_ISSET(sock_fd, &readfds))
+        if (FD_ISSET(server_sock_fd, &g_all_fds))
         {
-            int new_sock_fd = 0;
-
-            new_sock_fd = accept(sock_fd, (struct sockaddr *)&client_address,
-                                 &client_length);
-            if (new_sock_fd < 0)
+            printf("Processing new client...\n");
+            if (process_new_client(server_sock_fd, active_user_list) == OK)
             {
-                printf("ERROR on accept\n");
-                return -1;
-            }
-            printf("Got a new client, asking for name!\n");
-
-            // ask the client for their name
-            status = proto_request_client_name(new_sock_fd);
-            if (status != OK)
-            {
-                printf("Unable to request client name: %s\n",
-                       PROTO_ERR_T_STRING[status]);
-            }
-
-            // get the name from the client
-            char *name_out = NULL;
-            status         = proto_read_client_name(new_sock_fd, &name_out);
-            if (status != OK)
-            {
-                printf("Unable to read client name: %s\n",
-                       PROTO_ERR_T_STRING[status]);
-                status =
-                    proto_disconnect_client(new_sock_fd, "invalid client name");
-                if (status != OK)
-                {
-                    printf("Unable to disconnect client: %s\n",
-                           PROTO_ERR_T_STRING[status]);
-                }
-            }
-            else
-            {
-                printf("Adding a user!\n");
-                user_t *new_user = malloc(sizeof(user_t));
-                memset(new_user->name, '\0', MAX_USER_NAME_LENGTH);
-                if (!new_user)
-                {
-                    printf("Unable to allocate a user\n");
-                }
-                else
-                {
-                    new_user->client_socket_fd = new_sock_fd;
-                    memcpy(new_user->name, name_out, strlen(name_out));
-                    free(name_out);
-                    user_t *existing_user = (user_t *)list_search(
-                        active_user_list, user_comparator, new_user->name);
-                    if (existing_user)
-                    {
-                        printf("User with name %s already exists, kicking\n",
-                               new_user->name);
-                        status = proto_disconnect_client(
-                            new_sock_fd, "username already exists");
-                        if (status != OK)
-                        {
-                            printf("Unable to kick user: %s\n",
-                                   PROTO_ERR_T_STRING[status]);
-                        }
-                        free(new_user);
-                    }
-                    else
-                    {
-                        list_add(active_user_list, new_user);
-                        printf("Added user %s to active user list.\n",
-                               new_user->name);
-                        server_add_client_socket(new_user->client_socket_fd);
-                        connected_clients++;
-                    }
-                }
+                connected_clients++;
             }
         }
         // otherwise we have client activity
-        for (i = 0; i < MAX_CLIENTS; i++)
+        for (int i = 0; i < MAX_CLIENTS; i++)
         {
-            printf("we have client activity\n");
             int sd = g_client_sockets[i];
-            if (FD_ISSET(sd, &readfds))
+            // if it's not this client, check the next one... and so on, for
+            // each of them.
+            if (!FD_ISSET(sd, &g_all_fds))
             {
-                user_t *user = list_search(
-                    active_user_list, server_client_socket_fd_comparator, &sd);
-                if (!user)
-                {
-                    printf("Someone is talking, but I don't know who...\n");
-                    return -1;   // this is a problem
-                }
-                else
-                {
-                    printf("User [%s] has a message for the server.\n",
-                           user->name);
-                }
-                command_t * cmd    = NULL;
-                proto_err_t status = OK;
-                status             = proto_read_command(sd, &cmd);
-                if (status != OK)
-                {
-                    printf("Unable to read command from client [%s]: %s\n",
-                           user->name, PROTO_ERR_T_STRING[status]);
-                    g_client_sockets[i] = 0;
-                    connected_clients--;
-                    close(sd);
-                    continue;
-                }
-                if (cmd->command_type == CMD_REQUEST_DISCONNECT)
-                {
-                    printf("Client [%s] request disconnect.\n", user->name);
-                    g_client_sockets[i] = 0;
-                    connected_clients--;
-                    close(sd);
-                    list_remove(active_user_list, user);
-                    continue;
-                }
-                else if (cmd->command_type == CMD_REQUEST_USERLIST_FROM_SERVER)
-                {
-                    printf("User [%s] requests user list from server...\n",
-                           user->name);
-                    proto_send_user_list(sd, active_user_list);
-                }
-                else
-                {
-                    printf("User [%s] send a command:\n", user->name);
-                    proto_print_command(cmd);
-                }
+                continue;
+            }
+            user_t *user = list_search(active_user_list,
+                                       server_client_socket_fd_comparator, &sd);
+            if (!user)
+            {
+                printf("Someone is talking, but I don't know who...\n");
+                return -1;   // this is a problem
+            }
+            else
+            {
+                printf("User [%s] has a message for the server.\n", user->name);
+            }
+            command_t * cmd    = NULL;
+            proto_err_t status = OK;
+            status             = proto_read_command(sd, &cmd);
+            if (status != OK)
+            {
+                printf("Unable to read command from client [%s]: %s\n",
+                       user->name, PROTO_ERR_T_STRING[status]);
+                g_client_sockets[i] = 0;
+                connected_clients--;
+                list_remove(active_user_list, user);
+                close(sd);
+                continue;
+            }
+            if (cmd->command_type == CMD_REQUEST_DISCONNECT)
+            {
+                printf("Client [%s] request disconnect.\n", user->name);
+                g_client_sockets[i] = 0;
+                connected_clients--;
+                close(sd);
+                list_remove(active_user_list, user);
+                continue;
+            }
+            else if (cmd->command_type == CMD_REQUEST_USERLIST_FROM_SERVER)
+            {
+                printf("User [%s] requests user list from server...\n",
+                       user->name);
+                proto_send_user_list(sd, active_user_list);
+            }
+            else
+            {
+                printf("User [%s] send a command:\n", user->name);
+                proto_print_command(cmd);
             }
         }
+        printf("Done\n");
     }
     return 0;
 }
