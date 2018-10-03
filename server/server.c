@@ -18,6 +18,7 @@ proto_err_t create_server(unsigned short port_no, int *sock_fd_out);
 pthread_t g_client_handler_thread;
 int       g_client_sockets[MAX_CLIENTS];
 fd_set    g_all_fds;
+int       g_max_fd = 0;
 
 char server_client_socket_fd_comparator(void *context, void *key)
 {
@@ -43,16 +44,8 @@ void server_add_client_socket(int socket_fd)
         if (g_client_sockets[i] == 0)
         {
             g_client_sockets[i] = socket_fd;
-            FD_SET(socket_fd, &g_all_fds);
             break;
         }
-    }
-}
-void *server_handle_client_thread(void *context)
-{
-    while (1)
-    {
-        // handle clients
     }
 }
 
@@ -117,7 +110,9 @@ proto_err_t process_new_client(int server_sock_fd, list_t *active_user_list)
     {
         printf("Unable to request client name: %s\n",
                PROTO_ERR_T_STRING[status]);
-        return ERR_GENERAL;
+        close(new_sock_fd);
+        status = ERR_GENERAL;
+        goto done;
     }
 
     // get the name from the client
@@ -131,9 +126,10 @@ proto_err_t process_new_client(int server_sock_fd, list_t *active_user_list)
         {
             printf("Unable to disconnect client: %s\n",
                    PROTO_ERR_T_STRING[status]);
-            return status;
+            goto done;
         }
-        return ERR_GENERAL;
+        status = ERR_GENERAL;
+        goto done;
     }
 
     printf("Adding a user!\n");
@@ -142,7 +138,9 @@ proto_err_t process_new_client(int server_sock_fd, list_t *active_user_list)
     {
         printf("Unable to allocate a user\n");
         free(name_out);
-        return ERR_NO_MEM;
+        close(new_sock_fd);
+        status = ERR_NO_MEM;
+        goto done;
     }
     memset(new_user->name, '\0', MAX_USER_NAME_LENGTH);
     new_user->client_socket_fd = new_sock_fd;
@@ -160,13 +158,34 @@ proto_err_t process_new_client(int server_sock_fd, list_t *active_user_list)
             printf("Unable to kick user: %s\n", PROTO_ERR_T_STRING[status]);
         }
         free(new_user);
-        return ERR_GENERAL;
+        status = ERR_GENERAL;
+        goto done;
     }
 
     list_add(active_user_list, new_user);
     printf("Added user %s to active user list.\n", new_user->name);
     server_add_client_socket(new_user->client_socket_fd);
-    return OK;
+    // set the file descriptor
+    FD_SET(new_user->client_socket_fd, &g_all_fds);
+done:
+    if (status != OK)
+    {
+        // clear the descriptor
+        FD_CLR(new_sock_fd, &g_all_fds);
+    }
+
+    // calculate new max fd
+    for (int i = 0; i < MAX_CLIENTS; i++)
+    {
+        if (g_client_sockets[i] > 0)
+        {
+            if (FD_ISSET(g_client_sockets[i], &g_all_fds))
+            {
+                g_max_fd = MAX(g_max_fd, g_client_sockets[i]);
+            }
+        }
+    }
+    return status;
 }
 
 int main(int argc, char *argv[])
@@ -201,15 +220,16 @@ int main(int argc, char *argv[])
 
     FD_ZERO(&g_all_fds);
     FD_SET(server_sock_fd, &g_all_fds);
+    g_max_fd = server_sock_fd;
 
     while (1)
     {
         printf("blocking on select\n");
-        int activity = select(FD_SETSIZE, &g_all_fds, NULL, NULL, NULL);
+        int activity = select(g_max_fd + 1, &g_all_fds, NULL, NULL, NULL);
         printf("done blocking on select\n");
         if (activity < 0 && errno != EINTR)
         {
-            printf("Select error\n");
+            printf("Select error %d\n", errno);
             continue;
         }
 
@@ -231,7 +251,7 @@ int main(int argc, char *argv[])
                 continue;
             }
         }
-        // otherwise we have client activity
+        // otherwise we have a message from an already connected client
         for (int i = 0; i < MAX_CLIENTS; i++)
         {
             int sd = g_client_sockets[i];
@@ -262,6 +282,7 @@ int main(int argc, char *argv[])
                 g_client_sockets[i] = 0;
                 connected_clients--;
                 list_remove(active_user_list, user);
+                FD_CLR(sd, &g_all_fds);
                 close(sd);
                 continue;
             }
@@ -270,6 +291,7 @@ int main(int argc, char *argv[])
                 printf("Client [%s] request disconnect.\n", user->name);
                 g_client_sockets[i] = 0;
                 connected_clients--;
+                FD_CLR(sd, &g_all_fds);
                 close(sd);
                 list_remove(active_user_list, user);
                 continue;

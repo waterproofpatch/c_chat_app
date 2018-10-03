@@ -1,6 +1,10 @@
 #ifndef __SERVER_H_
 #define __SERVER_H_
 
+#ifndef MAX
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#endif
+
 /**
  * @brief send a disconnect message to the client and then terminate the socket
  * @param sock_fd: the socket for the client
