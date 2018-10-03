@@ -202,10 +202,10 @@ int main(int argc, char *argv[])
     FD_ZERO(&g_all_fds);
     FD_SET(server_sock_fd, &g_all_fds);
 
-    while (connected_clients < MAX_CLIENTS)
+    while (1)
     {
         printf("blocking on select\n");
-        int activity = select(MAX_CLIENTS, &g_all_fds, NULL, NULL, NULL);
+        int activity = select(FD_SETSIZE, &g_all_fds, NULL, NULL, NULL);
         printf("done blocking on select\n");
         if (activity < 0 && errno != EINTR)
         {
@@ -216,10 +216,19 @@ int main(int argc, char *argv[])
         // if the activity was on our listening socket, it's a new connection'
         if (FD_ISSET(server_sock_fd, &g_all_fds))
         {
-            printf("Processing new client...\n");
-            if (process_new_client(server_sock_fd, active_user_list) == OK)
+            if (connected_clients == MAX_CLIENTS)
             {
-                connected_clients++;
+                printf("Cannot accept any new clients!\n");
+                continue;
+            }
+            else
+            {
+                printf("Processing new client...\n");
+                if (process_new_client(server_sock_fd, active_user_list) == OK)
+                {
+                    connected_clients++;
+                }
+                continue;
             }
         }
         // otherwise we have client activity
