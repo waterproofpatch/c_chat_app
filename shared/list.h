@@ -1,3 +1,6 @@
+#ifndef _LIST_H_
+#define _LIST_H_
+
 #include <stddef.h>
 
 typedef struct _list_node_t
@@ -81,3 +84,5 @@ void *list_search(list_t *list, char (*key_comparator)(void *, void *), void *ke
  * @return: the size of the list
  */
 size_t list_count(list_t *list);
+
+#endif

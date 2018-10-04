@@ -50,7 +50,8 @@ static int get_line_from_user(char *buff, size_t buff_length)
     return 1;
 }
 
-static void print_commands() {
+static void print_commands()
+{
     printf("Available commands:\n");
     printf("/getusers - Get list of conneted users\n");
     printf("/quit - Disconnect from server\n");
@@ -72,7 +73,7 @@ static void cmd_loop(int sock_fd)
         {
             printf("Goodbye!\n");
             g_is_alive = 0;
-            status = proto_disconnect_from_server(sock_fd,
+            status     = proto_disconnect_from_server(sock_fd,
                                                   "user initiated disconnect");
             if (status != OK)
             {
@@ -172,8 +173,14 @@ void *receive_function(void *context)
         {
             printf("Failed reading a command: %s\n",
                    PROTO_ERR_T_STRING[status]);
+            if (status == ERR_REMOTE_HOST_CLOSED)
+            {
+                printf("Cannot recover from this error. Closing down...\n");
+                break;
+            }
             continue;
         }
+        printf("Read command from server.\n");
         proto_print_command(cmd);
         if (cmd->command_type == CMD_REQUEST_DISCONNECT)
         {
@@ -182,6 +189,15 @@ void *receive_function(void *context)
                 "Disconnecting...\n",
                 cmd->payload);
             break;
+        }
+        else if (cmd->command_type == CMD_USER_LIST)
+        {
+            name_list_t *name_list = (name_list_t *)cmd->payload;
+            printf("%d users connected:\n", name_list->num_names);
+            for (int i = 0; i < name_list->num_names; i++)
+            {
+                printf("Name: [%s]\n", name_list->usernames[i]);
+            }
         }
     }
     printf("Receive thread terminating.\n");
