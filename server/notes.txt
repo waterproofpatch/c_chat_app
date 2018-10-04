@@ -1,0 +1,9 @@
+start server
+connect user1
+connect user2
+connect user3
+disconnect user1
+disconnect user3
+connect user1
+connect user3
+disconnect user1 | disconnect user3 -> repro problem

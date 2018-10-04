@@ -39,7 +39,7 @@ void server_init_client_sockets()
     int i;
     for (i = 0; i < MAX_CLIENTS; i++)
     {
-        g_client_sockets[i] = 0;
+        g_client_sockets[i] = -1;
     }
 }
 
@@ -48,7 +48,7 @@ void server_add_client_socket(int socket_fd)
     int i;
     for (i = 0; i < MAX_CLIENTS; i++)
     {
-        if (g_client_sockets[i] == 0)
+        if (g_client_sockets[i] == -1)
         {
             g_client_sockets[i] = socket_fd;
             break;
@@ -199,7 +199,7 @@ static void update_max_fd()
     g_max_fd = g_server_sock_fd;
     for (int i = 0; i < MAX_CLIENTS; i++)
     {
-        if (g_client_sockets[i] > 0)
+        if (g_client_sockets[i] > -1)
         {
             FD_SET(g_client_sockets[i], &g_all_fds);
             g_max_fd = MAX(g_max_fd, g_client_sockets[i]);
@@ -275,6 +275,7 @@ int main(int argc, char *argv[])
         for (int i = 0; i < MAX_CLIENTS; i++)
         {
             int sd = g_client_sockets[i];
+            if (sd == -1) { continue; }
             // if it's not this client, check the next one... and so on, for
             // each of them.
             if (!FD_ISSET(sd, &g_all_fds))
@@ -299,7 +300,7 @@ int main(int argc, char *argv[])
             {
                 printf("Unable to read command from client [%s]: %s\n",
                        user->name, PROTO_ERR_T_STRING[status]);
-                g_client_sockets[i] = 0;
+                g_client_sockets[i] = -1;
                 connected_clients--;
                 list_remove(active_user_list, user);
                 close(sd);
@@ -308,7 +309,7 @@ int main(int argc, char *argv[])
             if (cmd->command_type == CMD_REQUEST_DISCONNECT)
             {
                 printf("Client [%s] request disconnect.\n", user->name);
-                g_client_sockets[i] = 0;
+                g_client_sockets[i] = -1;
                 connected_clients--;
                 close(sd);
                 list_remove(active_user_list, user);
