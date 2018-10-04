@@ -20,11 +20,6 @@
 static proto_err_t proto_send_command(int            sock_fd,
                                       command_type_t cmd_type,
                                       char *         payload,
-                                      size_t         payload_length);
-
-static proto_err_t proto_send_command(int            sock_fd,
-                                      command_type_t cmd_type,
-                                      char *         payload,
                                       size_t         payload_length)
 {
     command_t *cmd = malloc(sizeof(command_t) + payload_length);
@@ -220,7 +215,8 @@ proto_err_t proto_send_user_list(int sock_fd, list_t *user_list)
         {
             return ERR_GENERAL;
         }
-        strncpy(name_list->usernames[i], active_user->name, MAX_USER_NAME_LENGTH);
+        strncpy(name_list->usernames[i], active_user->name,
+                MAX_USER_NAME_LENGTH);
     }
     return proto_send_command(
         sock_fd, CMD_USER_LIST, (char *)name_list,
