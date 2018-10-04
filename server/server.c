@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        // TODO maybe need while num_ready_fd here, so we service each ready fd 
+        // TODO maybe need while num_ready_fd here, so we service each ready fd
         // before resetting them all in update_max_fd
 
         // if the activity was on our listening socket, it's a new connection'
@@ -275,7 +275,10 @@ int main(int argc, char *argv[])
         for (int i = 0; i < MAX_CLIENTS; i++)
         {
             int sd = g_client_sockets[i];
-            if (sd == -1) { continue; }
+            if (sd == -1)
+            {
+                continue;
+            }
             // if it's not this client, check the next one... and so on, for
             // each of them.
             if (!FD_ISSET(sd, &g_all_fds))
