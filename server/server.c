@@ -182,16 +182,9 @@ proto_err_t process_new_client(int g_server_sock_fd, list_t *active_user_list)
     list_add(active_user_list, new_user);
     printf("Added user %s to active user list.\n", new_user->name);
     server_add_client_socket(new_user->client_socket_fd);
-    // set the file descriptor
-    FD_SET(new_user->client_socket_fd, &g_all_fds);
     status = OK;
-done:
-    if (status != OK)
-    {
-        // clear the descriptor
-        FD_CLR(new_sock_fd, &g_all_fds);
-    }
 
+done:
     return status;
 }
 
@@ -255,6 +248,9 @@ int main(int argc, char *argv[])
             continue;
         }
 
+        // TODO maybe need while num_ready_fd here, so we service each ready fd 
+        // before resetting them all in update_max_fd
+
         // if the activity was on our listening socket, it's a new connection'
         if (FD_ISSET(g_server_sock_fd, &g_all_fds))
         {
@@ -306,7 +302,6 @@ int main(int argc, char *argv[])
                 g_client_sockets[i] = 0;
                 connected_clients--;
                 list_remove(active_user_list, user);
-                FD_CLR(sd, &g_all_fds);
                 close(sd);
                 continue;
             }
@@ -315,7 +310,6 @@ int main(int argc, char *argv[])
                 printf("Client [%s] request disconnect.\n", user->name);
                 g_client_sockets[i] = 0;
                 connected_clients--;
-                FD_CLR(sd, &g_all_fds);
                 close(sd);
                 list_remove(active_user_list, user);
                 continue;
