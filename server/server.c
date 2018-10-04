@@ -22,9 +22,10 @@
  * */
 static proto_err_t create_server(unsigned short port_no, int *sock_fd_out);
 
-pthread_t g_client_handler_thread;   // TODO unused
-int       g_client_sockets[MAX_CLIENTS];
-fd_set    g_all_fds;
+int    g_client_sockets[MAX_CLIENTS];   // each client's fd
+int    g_max_fd;                        // max file descriptor
+int    g_server_sock_fd = 0;            // server socket
+fd_set g_all_fds;                       // set file descriptors
 
 char server_client_socket_fd_comparator(void *context, void *key)
 {
@@ -94,14 +95,14 @@ proto_err_t create_server(unsigned short port_no, int *sock_fd_out)
     return OK;
 }
 
-proto_err_t process_new_client(int server_sock_fd, list_t *active_user_list)
+proto_err_t process_new_client(int g_server_sock_fd, list_t *active_user_list)
 {
     proto_err_t        status         = OK;
     socklen_t          client_length  = sizeof(struct sockaddr_in);
     struct sockaddr_in client_address = {0};
     int                new_sock_fd    = 0;
 
-    new_sock_fd = accept(server_sock_fd, (struct sockaddr *)&client_address,
+    new_sock_fd = accept(g_server_sock_fd, (struct sockaddr *)&client_address,
                          &client_length);
     if (new_sock_fd < 0)
     {
@@ -184,11 +185,27 @@ done:
     return status;
 }
 
+/**
+ * @brief update the max FD value.
+ * 
+ */
+static void update_max_fd()
+{
+    g_max_fd = g_server_sock_fd;
+    for (int i = 0; i < MAX_CLIENTS; i++)
+    {
+        if (g_client_sockets[i] > 0)
+        {
+            FD_SET(g_client_sockets[i], &g_all_fds);
+            g_max_fd = MAX(g_max_fd, g_client_sockets[i]);
+        }
+    }
+}
+
 int main(int argc, char *argv[])
 {
     // we'll listen on a high port to avoid having to sudo
     proto_err_t    status           = OK;
-    int            server_sock_fd   = 0;
     unsigned short port_no          = 5001;
     list_t *       active_user_list = 0;
 
@@ -201,7 +218,7 @@ int main(int argc, char *argv[])
 
     // create the server
     printf("server running on port %d\n", port_no);
-    status = create_server(port_no, &server_sock_fd);
+    status = create_server(port_no, &g_server_sock_fd);
     if (status != OK)
     {
         printf("Unable to create server: %s\n", PROTO_ERR_T_STRING[status]);
@@ -215,22 +232,22 @@ int main(int argc, char *argv[])
     int connected_clients = 0;
 
     FD_ZERO(&g_all_fds);
-    FD_SET(server_sock_fd, &g_all_fds);
+    FD_SET(g_server_sock_fd, &g_all_fds);
 
     while (1)
     {
-        printf("blocking on select\n");
-        // int activity = select(g_max_fd + 1, &g_all_fds, NULL, NULL, NULL);
-        int activity = select(FD_SETSIZE, &g_all_fds, NULL, NULL, NULL);
-        printf("done blocking on select\n");
-        if (activity < 0 && errno != EINTR)
+        // recalculate the maximum FD for our call to select
+        update_max_fd();
+
+        int num_ready_fd = select(g_max_fd + 1, &g_all_fds, NULL, NULL, NULL);
+        if (num_ready_fd < 0 && errno != EINTR)
         {
             printf("Select error %d\n", errno);
             continue;
         }
 
         // if the activity was on our listening socket, it's a new connection'
-        if (FD_ISSET(server_sock_fd, &g_all_fds))
+        if (FD_ISSET(g_server_sock_fd, &g_all_fds))
         {
             if (connected_clients == MAX_CLIENTS)
             {
@@ -240,13 +257,15 @@ int main(int argc, char *argv[])
             else
             {
                 printf("Processing new client...\n");
-                if (process_new_client(server_sock_fd, active_user_list) == OK)
+                if (process_new_client(g_server_sock_fd, active_user_list) ==
+                    OK)
                 {
                     connected_clients++;
                 }
                 continue;
             }
         }
+
         // otherwise we have a message from an already connected client
         for (int i = 0; i < MAX_CLIENTS; i++)
         {
