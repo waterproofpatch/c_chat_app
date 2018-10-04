@@ -76,6 +76,16 @@ proto_err_t create_server(unsigned short port_no, int *sock_fd_out)
     serv_addr.sin_addr.s_addr = INADDR_ANY;
     serv_addr.sin_port        = htons(port_no);
 
+    int enable = 1;
+    if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+    {
+        printf("Error setting sockopts.\n");
+    }
+    if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(int)) < 0)
+    {
+        printf("Error setting sockopts.\n");
+    }
+
     // bind our socket file descriptor to the host address so it is notified of
     // inbound traffic/events...
     if (bind(sock_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
@@ -187,10 +197,12 @@ done:
 
 /**
  * @brief update the max FD value.
- * 
+ *
  */
 static void update_max_fd()
 {
+    FD_ZERO(&g_all_fds);
+    FD_SET(g_server_sock_fd, &g_all_fds);
     g_max_fd = g_server_sock_fd;
     for (int i = 0; i < MAX_CLIENTS; i++)
     {
@@ -230,9 +242,6 @@ int main(int argc, char *argv[])
 
     // wait for a client to connect
     int connected_clients = 0;
-
-    FD_ZERO(&g_all_fds);
-    FD_SET(g_server_sock_fd, &g_all_fds);
 
     while (1)
     {
