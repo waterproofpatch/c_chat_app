@@ -78,7 +78,7 @@ proto_err_t proto_read_command(int sock_fd, command_t **cmd_out)
     {
         printf(
             "Remote host wants to send too much payload data. Not reading.\n");
-        return ERR_PAYLOAD_TOO_LARGE;   // TODO maybe kick?
+        return ERR_PAYLOAD_TOO_LARGE;   
     }
     // now we know the size of the full resulting command, copy in header and
     // read payload
@@ -95,6 +95,7 @@ proto_err_t proto_read_command(int sock_fd, command_t **cmd_out)
     if (cmd_hdr.payload_length > 0)
     {
         // read payload information
+        printf("Attempting to read %d payload bytes from server\n", cmd_hdr.payload_length);
         if (read(sock_fd, result_command->payload, cmd_hdr.payload_length) !=
             cmd_hdr.payload_length)
         {
@@ -110,6 +111,10 @@ proto_err_t proto_read_command(int sock_fd, command_t **cmd_out)
 
 void proto_print_command(command_t *command)
 {
+    if (command->command_type >= CMD_CANARY) {
+        printf("Command type %d is invalid.\n", command->command_type);
+        return;
+    }
     printf("command->command_type: %s\n",
            COMMAND_TYPE_T_STRING[command->command_type]);
     printf("command->payload_length: %d\n", command->payload_length);

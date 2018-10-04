@@ -180,6 +180,7 @@ void *receive_function(void *context)
             }
             continue;
         }
+        printf("Read command from server.\n");
         proto_print_command(cmd);
         if (cmd->command_type == CMD_REQUEST_DISCONNECT)
         {
