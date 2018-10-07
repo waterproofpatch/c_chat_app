@@ -8,6 +8,13 @@
 
 #define MAX_CLIENTS 10
 
+// conditional static for test
+#ifndef TEST
+#define STATIC static
+#else
+#define STATIC
+#endif
+
 #define CMD_MAX_PAYLOAD_LENGTH \
     1000   // the maximum length allowed for any command payload
 #define CMD_MAX_NAME_LENGTH 20   // max length for a command name string
@@ -73,5 +80,18 @@ proto_err_t proto_send_user_list(int sock_fd, list_t *user_list);
  * @param command: the command to print
  * */
 void proto_print_command(command_t *command);
+
+/**
+ * @brief private function for sending commands to a client
+ * @param sock_fd: the socket to send the data to
+ * @param cmd_type: the type of command
+ * @param payload: the payload to send
+ * @param payload_length: the length of the pay
+ * @return: OK if sending the command was successful, ERR_* otherwise
+ */
+STATIC proto_err_t proto_send_command(int            sock_fd,
+                                      command_type_t cmd_type,
+                                      char *         payload,
+                                      size_t         payload_length);
 
 #endif   // __PROTOCOL_H_

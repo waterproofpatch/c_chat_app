@@ -17,7 +17,7 @@
  * @param payload_length: the length of the payload, if any (0 for NULL
  * payloads)
  */
-static proto_err_t proto_send_command(int            sock_fd,
+STATIC proto_err_t proto_send_command(int            sock_fd,
                                       command_type_t cmd_type,
                                       char *         payload,
                                       size_t         payload_length)
