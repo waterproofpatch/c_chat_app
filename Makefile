@@ -25,8 +25,9 @@ server:
 
 .PHONY: test
 test:
-	ceedling gcov:all
-	ceedling utils:gcov
+	ceedling clobber # remove all build artifacts from last test
+	ceedling gcov:all # run test and generate coverage metrics
+	ceedling utils:gcov # convert coverage metrics to html
 
 clean:
 	@rm -rf $(BIN)
