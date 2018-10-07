@@ -2,6 +2,11 @@
 
 Application for a C based centralized chat server.
 
+## Prerequisites
+
+* ceedling (for CMock)
+* gcc (for compilation)
+
 ## Build
 
 ```bash
