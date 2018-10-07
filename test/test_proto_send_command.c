@@ -1,6 +1,8 @@
 #include "unity.h"
 #include "cmock.h"
 
+#include <stdio.h>
+
 #include "error_codes.h"
 
 // mocks
@@ -16,9 +18,12 @@ void tearDown()
 {
 }
 
+/**
+ * @brief Test sending an arbitrary command
+ * 
+ */
 void test_proto_send_command()
 {
-    TEST_ASSERT_EQUAL(1, 1);
     char test_payload[10];
     TEST_ASSERT_TRUE(OK == proto_send_command(1, 2, test_payload, 10));
 }
