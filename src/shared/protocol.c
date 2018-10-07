@@ -58,18 +58,18 @@ proto_err_t proto_read_command(int sock_fd, command_t **cmd_out)
 
     *cmd_out = NULL;
 
-    int bytes_read = read(sock_fd, &cmd_hdr, sizeof(command_t));
-    if (bytes_read == 0)
+    int bytes_wrappers_read = wrappers_read(sock_fd, &cmd_hdr, sizeof(command_t));
+    if (bytes_wrappers_read == 0)
     {
         printf("No more data. Remote host closed?\n");
         return ERR_REMOTE_HOST_CLOSED;
     }
-    if (bytes_read < 0)
+    if (bytes_wrappers_read < 0)
     {
-        printf("Failed reading cmd_hdr\n");
+        printf("Failed wrappers_reading cmd_hdr\n");
         return ERR_NETWORK_FAILURE;
     }
-    if (bytes_read < sizeof(command_t))
+    if (bytes_wrappers_read < sizeof(command_t))
     {
         printf("Not enough data for a command\n");
         return ERR_INVALID_COMMAND;
@@ -78,11 +78,11 @@ proto_err_t proto_read_command(int sock_fd, command_t **cmd_out)
     if (cmd_hdr.payload_length > CMD_MAX_PAYLOAD_LENGTH - 1)
     {
         printf(
-            "Remote host wants to send too much payload data. Not reading.\n");
+            "Remote host wants to send too much payload data. Not wrappers_reading.\n");
         return ERR_PAYLOAD_TOO_LARGE;   
     }
     // now we know the size of the full resulting command, copy in header and
-    // read payload
+    // wrappers_read payload
     result_command = wrappers_malloc(sizeof(command_t) + cmd_hdr.payload_length);
     if (!result_command)
     {
@@ -95,12 +95,12 @@ proto_err_t proto_read_command(int sock_fd, command_t **cmd_out)
     wrappers_memcpy(result_command, &cmd_hdr, sizeof(command_t));
     if (cmd_hdr.payload_length > 0)
     {
-        // read payload information
-        printf("Attempting to read %d payload bytes from server\n", cmd_hdr.payload_length);
-        if (read(sock_fd, result_command->payload, cmd_hdr.payload_length) !=
+        // wrappers_read payload information
+        printf("Attempting to wrappers_read %d payload bytes from server\n", cmd_hdr.payload_length);
+        if (wrappers_read(sock_fd, result_command->payload, cmd_hdr.payload_length) !=
             cmd_hdr.payload_length)
         {
-            printf("Unable to read %d bytes from remote host\n",
+            printf("Unable to wrappers_read %d bytes from remote host\n",
                    cmd_hdr.payload_length);
             wrappers_free(result_command);
             return ERR_NETWORK_FAILURE;
@@ -145,7 +145,7 @@ proto_err_t proto_disconnect_from_server(int sock_fd, char *reason)
     return status;
 }
 
-proto_err_t proto_read_client_name(int sock_fd, char **name_out)
+proto_err_t proto_wrappers_read_client_name(int sock_fd, char **name_out)
 {
     proto_err_t status   = OK;
     command_t * cmd_name = NULL;
@@ -154,7 +154,7 @@ proto_err_t proto_read_client_name(int sock_fd, char **name_out)
     status = proto_read_command(sock_fd, &cmd_name);
     if (status != OK)
     {
-        printf("Unable to read client name.\n");
+        printf("Unable to wrappers_read client name.\n");
         goto done;
     }
     if (cmd_name->command_type != CMD_RESPONSE_NAME)

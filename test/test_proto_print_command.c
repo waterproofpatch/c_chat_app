@@ -2,6 +2,7 @@
 #include "cmock.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include "error_codes.h"
 
