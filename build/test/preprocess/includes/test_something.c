@@ -1,7 +1,0 @@
----
-- unity.h
-- cmock.h
-- error_codes.h
-- mock_list.h
-- protocol.h
-- build/temp/_test_something.c
