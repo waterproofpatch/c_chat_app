@@ -38,8 +38,6 @@ void test_proto_send_command()
 
     char test_payload[10];
 
-
-
-    if ((OK == proto_send_command(1, 2, test_payload, 10))) {} else {UnityFail( ((" Expected TRUE Was FALSE")), (UNITY_UINT)((UNITY_UINT)(24)));};
+    if ((OK == proto_send_command(1, 2, test_payload, 10))) {} else {UnityFail( ((" Expected TRUE Was FALSE")), (UNITY_UINT)((UNITY_UINT)(23)));};
 
 }

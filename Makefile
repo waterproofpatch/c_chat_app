@@ -25,7 +25,9 @@ server:
 
 .PHONY: test
 test:
-	ceedling test:all
+	#ceedling test:all
+	ceedling gcov:all
+	ceedling utils:gcov
 
 clean:
 	@rm -rf $(BIN)
