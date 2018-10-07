@@ -1,11 +1,12 @@
-INCLUDES=shared
+SRC = src
+INCLUDES=$(SRC)/shared
 BIN=bin
 BIN_SERVER=$(BIN)/server
 BIN_CLIENT=$(BIN)/client
 OUT_SERVER=$(BIN_SERVER)/server.bin
 OUT_CLIENT=$(BIN_CLIENT)/client.bin
-CLIENT_SRC=client/*.c shared/*.c
-SERVER_SRC=server/*.c shared/*.c
+CLIENT_SRC=$(SRC)/client/*.c $(SRC)/shared/*.c
+SERVER_SRC=$(SRC)/server/*.c $(SRC)/shared/*.c
 CFLAGS=-g2 -Wall -pthread
 LFLAGS=
 
@@ -21,6 +22,10 @@ client:
 server:
 	@mkdir -p $(BIN_SERVER)
 	gcc $(CFLAGS) -I $(INCLUDES) $(SERVER_SRC) -o $(OUT_SERVER)
+
+.PHONY: test
+test:
+	ceedling test:all
 
 clean:
 	@rm -rf $(BIN)
