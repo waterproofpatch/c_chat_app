@@ -30,10 +30,10 @@ STATIC proto_err_t proto_send_command(int            sock_fd,
     }
 
     // zero out command
-    memset(cmd, 0, sizeof(command_t) + payload_length);
+    wrappers_memset(cmd, 0, sizeof(command_t) + payload_length);
     if (payload)
     {
-        memcpy(cmd->payload, payload, payload_length);
+        wrappers_memcpy(cmd->payload, payload, payload_length);
     }
 
     // copy command attributes
@@ -41,7 +41,7 @@ STATIC proto_err_t proto_send_command(int            sock_fd,
     cmd->payload_length = payload_length;
 
     // send the command to the remote machine
-    if (write(sock_fd, cmd, sizeof(command_t) + payload_length) < 0)
+    if (wrappers_write(sock_fd, cmd, sizeof(command_t) + payload_length) < 0)
     {
         return ERR_NETWORK_FAILURE;
     }
@@ -90,9 +90,9 @@ proto_err_t proto_read_command(int sock_fd, command_t **cmd_out)
         return ERR_NO_MEM;
     }
 
-    memset(result_command, 0, sizeof(command_t) + cmd_hdr.payload_length);
+    wrappers_memset(result_command, 0, sizeof(command_t) + cmd_hdr.payload_length);
     // copy in the command header information
-    memcpy(result_command, &cmd_hdr, sizeof(command_t));
+    wrappers_memcpy(result_command, &cmd_hdr, sizeof(command_t));
     if (cmd_hdr.payload_length > 0)
     {
         // read payload information
@@ -102,7 +102,7 @@ proto_err_t proto_read_command(int sock_fd, command_t **cmd_out)
         {
             printf("Unable to read %d bytes from remote host\n",
                    cmd_hdr.payload_length);
-            free(result_command);
+            wrappers_free(result_command);
             return ERR_NETWORK_FAILURE;
         }
     }
@@ -120,7 +120,7 @@ void proto_print_command(command_t *command)
            COMMAND_TYPE_T_STRING[command->command_type]);
     printf("command->payload_length: %d\n", command->payload_length);
     int i;
-    for (i = 0; i < command->payload_length; i++)
+    for (i = 0; i <= CMD_MAX_PAYLOAD_LENGTH && i < command->payload_length; i++)
     {
         printf("[0x%02x] ", command->payload[i]);
     }
@@ -179,12 +179,12 @@ proto_err_t proto_read_client_name(int sock_fd, char **name_out)
         goto done;
     }
     name[cmd_name->payload_length] = '\0';   // null terminate the name
-    memcpy(name, cmd_name->payload, cmd_name->payload_length);
+    wrappers_memcpy(name, cmd_name->payload, cmd_name->payload_length);
     *name_out = name;
 
 done:
-    // we're done with cmd_name, free it
-    free(cmd_name);
+    // we're done with cmd_name, wrappers_free it
+    wrappers_free(cmd_name);
     return status;
 }
 
