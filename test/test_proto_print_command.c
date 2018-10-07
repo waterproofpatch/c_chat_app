@@ -7,6 +7,7 @@
 
 // mocks
 #include "mock_list.h"
+#include "mock_wrappers.h"
 
 // protocol
 #include "protocol.h"

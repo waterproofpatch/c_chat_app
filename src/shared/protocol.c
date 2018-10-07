@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include "protocol.h"
+#include "wrappers.h"
 #include "error_codes.h"
 #include "user.h"
 #include "list.h"
@@ -22,7 +23,7 @@ STATIC proto_err_t proto_send_command(int            sock_fd,
                                       char *         payload,
                                       size_t         payload_length)
 {
-    command_t *cmd = malloc(sizeof(command_t) + payload_length);
+    command_t *cmd = wrappers_malloc(sizeof(command_t) + payload_length);
     if (!cmd)
     {
         return ERR_NO_MEM;
@@ -82,7 +83,7 @@ proto_err_t proto_read_command(int sock_fd, command_t **cmd_out)
     }
     // now we know the size of the full resulting command, copy in header and
     // read payload
-    result_command = malloc(sizeof(command_t) + cmd_hdr.payload_length);
+    result_command = wrappers_malloc(sizeof(command_t) + cmd_hdr.payload_length);
     if (!result_command)
     {
         printf("Unable to allocate command!\n");
@@ -170,7 +171,7 @@ proto_err_t proto_read_client_name(int sock_fd, char **name_out)
         goto done;
     }
 
-    char *name = malloc(cmd_name->payload_length + 1);
+    char *name = wrappers_malloc(cmd_name->payload_length + 1);
     if (!name)
     {
         printf("Unable to allocate a name buffer!\n");
@@ -206,7 +207,7 @@ proto_err_t proto_send_user_list(int sock_fd, list_t *user_list)
 {
     // TODO protect user list with semaphore, always (delegate through accessor)
     int          num_users = list_count(user_list);
-    name_list_t *name_list = malloc(sizeof(name_list_t));
+    name_list_t *name_list = wrappers_malloc(sizeof(name_list_t));
     if (!name_list)
     {
         return ERR_NO_MEM;
