@@ -25,7 +25,6 @@ server:
 
 .PHONY: test
 test:
-	#ceedling test:all
 	ceedling gcov:all
 	ceedling utils:gcov
 
