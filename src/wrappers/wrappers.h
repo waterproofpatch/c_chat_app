@@ -16,6 +16,8 @@
 
 void* wrappers_malloc(size_t size);
 
+int wrappers_close(int fd);
+
 void wrappers_free(void* p);
 
 void* wrappers_memset(void* b, int c, size_t len);

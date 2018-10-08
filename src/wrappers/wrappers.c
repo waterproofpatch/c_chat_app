@@ -32,3 +32,7 @@ ssize_t wrappers_read(int filedes, void* buf, size_t nbyte)
 {
     return read(filedes, buf, nbyte);
 }
+
+int wrappers_close(int fd) {
+    return close(fd);
+}
