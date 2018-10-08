@@ -81,6 +81,7 @@ proto_err_t proto_send_user_list(int sock_fd, list_t *user_list);
  * */
 void proto_print_command(command_t *command);
 
+#ifdef TEST
 /**
  * @brief private function for sending commands to a client
  * @param sock_fd: the socket to send the data to
@@ -93,5 +94,6 @@ STATIC proto_err_t proto_send_command(int            sock_fd,
                                       command_type_t cmd_type,
                                       char *         payload,
                                       size_t         payload_length);
+#endif
 
 #endif   // __PROTOCOL_H_
