@@ -5,15 +5,17 @@
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
 
-/**
- * @brief send a disconnect message to the client and then terminate the socket
- * @param sock_fd: the socket for the client
- */
-void disconnect_client(int sock_fd);
+#define DBG_INFO(fmt, ...)                                                   \
+    do                                                                       \
+    {                                                                        \
+        fprintf(stderr, "%s:%d:%s INFO: " fmt, __FILE__, __LINE__, __func__, \
+                ##__VA_ARGS__);                                              \
+    } while (0)
+#define DBG_ERROR(fmt, ...)                                                   \
+    do                                                                        \
+    {                                                                         \
+        fprintf(stderr, "%s:%d:%s ERROR: " fmt, __FILE__, __LINE__, __func__, \
+                ##__VA_ARGS__);                                               \
+    } while (0)
 
-char server_client_socket_fd_comparator(void *context, void *key);
-void server_init_client_sockets();
-void server_add_client_socket(int socket_fd);
-void *server_handle_client_thread(void *context);
-
-#endif // __SERVER_H_
+#endif   // __SERVER_H_

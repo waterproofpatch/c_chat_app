@@ -5,3 +5,6 @@ disconnect user2 /quit
 connect user2
 disconnect user2 /quit
 >> problem occurs
+
+
+* problem lies in reconnecting user not being added properly to the active user list

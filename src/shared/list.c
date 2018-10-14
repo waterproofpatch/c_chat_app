@@ -6,20 +6,19 @@ list_t *list_init(void *(*list_malloc)(size_t), void (*list_free)(void *))
 
     list_t *list = (list_t *)list_malloc(sizeof(list_t));
     list->head = list->tail = NULL;
-    list->count = 0;
-    list->list_malloc = list_malloc;
-    list->list_free = list_free;
+    list->count             = 0;
+    list->list_malloc       = list_malloc;
+    list->list_free         = list_free;
     return list;
 }
 
 void list_destroy(list_t *list)
 {
-    list_node_t *cur = list->head;
+    list_node_t *cur  = list->head;
     list_node_t *next = NULL;
     while (cur)
     {
         next = cur->next;
-        list->list_free(cur->element);
         list->list_free(cur);
         cur = next;
     }
@@ -28,8 +27,13 @@ void list_destroy(list_t *list)
 
 void list_add(list_t *list, void *element)
 {
-    list_node_t *new_node = (list_node_t *)list->list_malloc(sizeof(list_node_t));
-    new_node->next = NULL;
+    list_node_t *new_node =
+        (list_node_t *)list->list_malloc(sizeof(list_node_t));
+    if (!new_node)
+    {
+        return;   // TODO should have error return
+    }
+    new_node->next    = NULL;
     new_node->element = element;
 
     // first element
@@ -43,31 +47,46 @@ void list_add(list_t *list, void *element)
 
     // append element
     list->tail->next = new_node;
-    list->tail = new_node;
+    list->tail       = new_node;
     list->count++;
 }
 
 void list_remove(list_t *list, void *element)
 {
-    list_node_t **pp = &list->head; /* pointer to a pointer */
-    list_node_t *entry = list->head;
+    list_node_t *cur  = list->head;
+    list_node_t *prev = NULL;
 
-    while (entry)
+    while (cur && cur->element != element)
     {
-        // ptr comparison (user should provide addr of element to remove)
-        if (entry->element == element)
-        {
-            *pp = entry->next;
-            list->list_free(entry);
-            list->count--;
-            return;
-        }
-        pp = &entry->next;
-        entry = entry->next;
+        prev = cur;
+        cur  = cur->next;
     }
+    // not found
+    if (!cur)
+    {
+        return;
+    }
+    // if we're removing the tail, move the tail back
+    if (cur == list->tail)
+    {
+        list->tail = prev;
+    }
+    if (prev)
+    {
+        prev->next = cur->next;
+    }
+    else
+    {
+        list->head = cur->next;
+    }
+    list->list_free(cur);
+    list->count--;
+    return;
 }
 
-void list_foreach(list_t *list, void (*process_func)(void *, void *), void *context)
+void list_foreach(list_t *list,
+                  void (*process_func)(void *, void *),
+                  void *context)
 {
     list_node_t *cur = list->head;
     while (cur)
@@ -79,7 +98,7 @@ void list_foreach(list_t *list, void (*process_func)(void *, void *), void *cont
 
 void *list_get_at_index(list_t *list, unsigned int index)
 {
-    unsigned int i = 0;
+    unsigned int i   = 0;
     list_node_t *cur = list->head;
     while (cur && i++ < index)
     {
@@ -89,7 +108,9 @@ void *list_get_at_index(list_t *list, unsigned int index)
     return cur != NULL ? cur->element : NULL;
 }
 
-void *list_search(list_t *list, char (*key_comparator)(void *, void *), void *key)
+void *list_search(list_t *list,
+                  char (*key_comparator)(void *, void *),
+                  void *key)
 {
     list_node_t *cur = list->head;
     while (cur)
