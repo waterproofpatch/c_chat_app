@@ -28,4 +28,12 @@ ssize_t wrappers_write(int filedes, void* buf, size_t nbyte);
 
 ssize_t wrappers_read(int filedes, void* buf, size_t nbyte);
 
+int wrappers_socket(int domain, int type, int protocol);
+
+int wrappers_select(int     ndfs,
+                    fd_set* readfds,
+                    fd_set* writefds,
+                    fd_set* errorfds,
+                    struct timeval* timeout);
+
 #endif

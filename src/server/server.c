@@ -77,7 +77,7 @@ static void server_remove_user(user_t *user)
             break;
         }
     }
-    close(user->client_socket_fd);
+    wrappers_close(user->client_socket_fd);
     g_server_state.connected_clients--;
     list_remove(g_server_state.active_user_list, user);
     wrappers_free(user);
@@ -230,7 +230,7 @@ void server_handle_connections()
 {
     server_update_max_fd();
 
-    int num_ready_fd = select(g_server_state.max_fd + 1,
+    int num_ready_fd = wrappers_select(g_server_state.max_fd + 1,
                               &g_server_state.all_fds, NULL, NULL, NULL);
     if (num_ready_fd < 0 && errno != EINTR)
     {
@@ -317,10 +317,10 @@ proto_err_t server_create(unsigned short port_no)
     server_init_client_sockets();
 
     // initialize a user list to contain list of active users
-    g_server_state.active_user_list = list_init(malloc, free);
+    g_server_state.active_user_list = list_init(wrappers_malloc, wrappers_free);
 
     // create an 'INTERNET' STREAM socket
-    sock_fd = socket(AF_INET, SOCK_STREAM, 0);
+    sock_fd = wrappers_socket(AF_INET, SOCK_STREAM, 0);
     if (sock_fd < 0)
     {
         DBG_ERROR("ERROR opening socket\n");
