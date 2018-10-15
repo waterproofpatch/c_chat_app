@@ -17,7 +17,7 @@
 
 /**
  * @brief global state
- * 
+ *
  */
 server_state_t g_server_state = {0};
 
@@ -36,8 +36,8 @@ static char server_client_socket_fd_comparator(void *context, void *key)
 
 /**
  * @brief get the file descriptor for client at index
- * 
- * @param index the index into the global file descriptors table 
+ *
+ * @param index the index into the global file descriptors table
  * @return int the fd, or -1 if not found/not init
  */
 static int server_get_client_socket(int index)
@@ -51,7 +51,7 @@ static int server_get_client_socket(int index)
 
 /**
  * @brief initialize the client sockets to -1, the unused value.
- * 
+ *
  */
 static void server_init_client_sockets()
 {
@@ -63,13 +63,33 @@ static void server_init_client_sockets()
 }
 
 /**
- * @brief register a user with the server 
+ * @brief remove a client from the server
  * 
+ * @param user the user to remove
+ */
+static void server_remove_user(user_t *user)
+{
+    for (int i = 0; i < MAX_CLIENTS; i++)
+    {
+        if (g_server_state.client_sockets[i] == user->client_socket_fd)
+        {
+            g_server_state.client_sockets[i] = -1;
+            break;
+        }
+    }
+    close(user->client_socket_fd);
+    g_server_state.connected_clients--;
+    list_remove(g_server_state.active_user_list, user);
+    wrappers_free(user);
+}
+
+/**
+ * @brief register a user with the server
+ *
  * @param user the user to register
  */
-static void server_add_client_socket(user_t *user)
+static void server_add_user(user_t *user)
 {
-    list_add(g_server_state.active_user_list, user);
     int i;
     for (i = 0; i < MAX_CLIENTS; i++)
     {
@@ -79,11 +99,13 @@ static void server_add_client_socket(user_t *user)
             break;
         }
     }
+    g_server_state.connected_clients++;
+    list_add(g_server_state.active_user_list, user);
 }
 
 /**
  * @brief process a new client connection to the server socket
- * 
+ *
  * @return proto_err_t OK if client is accepted, ERR_* otherwise
  */
 static proto_err_t process_new_client()
@@ -98,8 +120,8 @@ static proto_err_t process_new_client()
     char *name_out = NULL;   // allocated by proto when we read in the username
     user_t *new_user = NULL;   // created when we get the username
 
-    new_sock_fd = accept(g_server_state.server_sock_fd, (struct sockaddr *)&client_address,
-                         &client_length);
+    new_sock_fd = accept(g_server_state.server_sock_fd,
+                         (struct sockaddr *)&client_address, &client_length);
     if (new_sock_fd < 0)
     {
         DBG_ERROR("ERROR on accept\n");
@@ -138,7 +160,6 @@ static proto_err_t process_new_client()
     if (!new_user)
     {
         DBG_ERROR("Unable to allocate a user\n");
-        close(new_sock_fd);
         status = ERR_NO_MEM;
         goto done;
     }
@@ -164,7 +185,7 @@ static proto_err_t process_new_client()
 
     DBG_INFO("Added user %s, socket %d to active user list.\n", new_user->name,
              new_user->client_socket_fd);
-    server_add_client_socket(new_user);
+    server_add_user(new_user);
     status = OK;
 
 done:
@@ -199,7 +220,8 @@ static void server_update_max_fd()
         if (g_server_state.client_sockets[i] > -1)
         {
             FD_SET(g_server_state.client_sockets[i], &g_server_state.all_fds);
-            g_server_state.max_fd = MAX(g_server_state.max_fd, g_server_state.client_sockets[i]);
+            g_server_state.max_fd =
+                MAX(g_server_state.max_fd, g_server_state.client_sockets[i]);
         }
     }
 }
@@ -208,15 +230,13 @@ void server_handle_connections()
 {
     server_update_max_fd();
 
-    int num_ready_fd = select(g_server_state.max_fd + 1, &g_server_state.all_fds, NULL, NULL, NULL);
+    int num_ready_fd = select(g_server_state.max_fd + 1,
+                              &g_server_state.all_fds, NULL, NULL, NULL);
     if (num_ready_fd < 0 && errno != EINTR)
     {
         DBG_INFO("Select error %d\n", errno);
         return;
     }
-
-    // TODO maybe need while num_ready_fd here, so we service each ready fd
-    // before resetting them all in server_update_max_fd
 
     // if the activity was on our listening socket, it's a new connection
     if (FD_ISSET(g_server_state.server_sock_fd, &g_server_state.all_fds))
@@ -231,7 +251,7 @@ void server_handle_connections()
             DBG_INFO("Processing new connection...\n");
             if (process_new_client() == OK)
             {
-                g_server_state.connected_clients++;
+                DBG_INFO("Accepted new client!\n");
             }
             else
             {
@@ -260,7 +280,7 @@ void server_handle_connections()
                 "Someone is talking on socket %d, but I don't know "
                 "who...\n",
                 sd);
-            return;   // this is a problem
+            continue;   // this is a problem
         }
         DBG_INFO("User [%s] has a message for the server.\n", user->name);
 
@@ -271,10 +291,7 @@ void server_handle_connections()
         {
             DBG_INFO("Status is %s, disconnecting client %s\n",
                      PROTO_ERR_T_STRING[status], user->name);
-            g_server_state.client_sockets[i] = -1;
-            g_server_state.connected_clients--;
-            list_remove(g_server_state.active_user_list, user);
-            close(sd);
+            server_remove_user(user);
             continue;
         }
         else if (cmd->command_type == CMD_REQUEST_USERLIST_FROM_SERVER)
@@ -289,7 +306,6 @@ void server_handle_connections()
             proto_print_command(cmd);
         }
     }
-    DBG_INFO("Done\n");
     return;
 }
 
