@@ -132,7 +132,6 @@ proto_err_t proto_disconnect_client(int sock_fd, char *reason)
     proto_err_t status = OK;
     status = proto_send_command(sock_fd, CMD_REQUEST_DISCONNECT, reason,
                                 strlen(reason));
-    wrappers_close(sock_fd);
     return status;
 }
 
@@ -141,7 +140,6 @@ proto_err_t proto_disconnect_from_server(int sock_fd, char *reason)
     proto_err_t status = OK;
     status = proto_send_command(sock_fd, CMD_REQUEST_DISCONNECT, reason,
                                 strlen(reason));
-    wrappers_close(sock_fd);
     return status;
 }
 
