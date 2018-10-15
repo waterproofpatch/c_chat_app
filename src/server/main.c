@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     if (status != OK)
     {
         DBG_INFO("Unable to create server: %s\n", PROTO_ERR_T_STRING[status]);
-        return -1;
+        return 1;
     }
 
     while (1)

@@ -41,10 +41,9 @@ void* memset_callback(void* dst, int c, size_t n, int num_calls) {
  * @brief test disconnecting a client
  *
  */
-void test_proto_disconnect_client()
+void test_proto_disconnect_from_server()
 {
     wrappers_write_ExpectAndReturn(2, g_ptr, sizeof(command_t) + strlen("some_reason"), sizeof(command_t) + strlen("some_reason"));
-    wrappers_close_ExpectAndReturn(2, 0);
     wrappers_malloc_StubWithCallback(malloc_callback);
     wrappers_memset_StubWithCallback(memset_callback);
     wrappers_memcpy_StubWithCallback(memcpy_callback);
