@@ -7,21 +7,24 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <unistd.h>
+
 #include "protocol.h"
 #include "user.h"
 #include "client.h"
 
+int          g_sock_fd;          // socket descriptor for the client connection
 pthread_t    g_receive_thread;   // thread to handle receiving data
 volatile int g_is_alive =
     1;   // global to keep listen thread alive, volatile to ensure cache flush
 
-// shameless SO theft of decent getline function...
-static int get_line_from_user(char *buff, size_t buff_length);
-
-// cmd loop to read input
-static void cmd_loop(int sock_fd);
-
-static int get_line_from_user(char *buff, size_t buff_length)
+/**
+ * @brief shameless SO copy pasta to read a line from stdin
+ * 
+ * @param buff buffer to fill with user data
+ * @param buff_length length of the buffer
+ * @return int 1 on success, -1 on failure
+ */
+static int client_get_line_from_user(char *buff, size_t buff_length)
 {
     int ch, extra;
 
@@ -30,7 +33,7 @@ static int get_line_from_user(char *buff, size_t buff_length)
     fflush(stdout);
     if (fgets(buff, buff_length, stdin) == NULL)
     {
-        return 0;
+        return -1;
     }
 
     // if it was too long, there'll be no newline. In that case, we flush
@@ -50,21 +53,81 @@ static int get_line_from_user(char *buff, size_t buff_length)
     return 1;
 }
 
-static void print_commands()
+/**
+ * @brief print the available commands
+ * 
+ */
+static void client_print_commands()
 {
     printf("Available commands:\n");
     printf("/getusers - Get list of conneted users\n");
     printf("/quit - Disconnect from server\n");
     printf("@<username> - PM a user\n");
 }
-static void cmd_loop(int sock_fd)
+
+proto_err_t client_handshake(char *username)
 {
-    print_commands();
+    // the server will tell us something...
+    command_t cmd = {0};
+    read(g_sock_fd, &cmd, sizeof(command_t));
+    if (cmd.command_type == CMD_REQUEST_NAME)
+    {
+        printf("Sending client name to server...\n");
+        // proto_send_client_name(sock_fd, "somedumuser",
+        // strlen("somedumbuser"));
+        proto_send_client_name(g_sock_fd, username, strlen(username));
+    }
+    else
+    {
+        printf("Server asked for something other than a name\n");
+        return ERR_INVALID_COMMAND;
+    }
+
+    // kick off receive thread to handle receipt of data
+    pthread_create(&g_receive_thread, NULL, client_receive_function, &g_sock_fd);
+    return OK;
+}
+
+proto_err_t client_connect(char *hostname, unsigned short port_no)
+{
+    struct sockaddr_in server_address = {0};
+
+    // initialize the server address structure
+    memset(&server_address, 0, sizeof(struct sockaddr_in));
+    server_address.sin_family = AF_INET;
+    server_address.sin_port   = htons(port_no);
+    if (inet_pton(AF_INET, hostname, &server_address.sin_addr) <= 0)
+    {
+        printf("inet_pton error occured: %s\n", strerror(errno));
+        return ERR_GENERAL;
+    }
+
+    // create a socket to handle data
+    g_sock_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (g_sock_fd < 0)
+    {
+        printf("ERROR opening socket\n");
+        return ERR_NETWORK_FAILURE;
+    }
+
+    // connect to the server address using the socket we created
+    if (connect(g_sock_fd, (struct sockaddr *)&server_address,
+                sizeof(struct sockaddr_in)) < 0)
+    {
+        printf("Error connecting: %s\n", strerror(errno));
+        return ERR_NETWORK_FAILURE;
+    }
+    return OK;
+}
+
+proto_err_t client_loop()
+{
+    client_print_commands();
     while (1)
     {
         char        buffer[256];
         proto_err_t status = OK;
-        if (get_line_from_user(buffer, sizeof(buffer)) != 1)
+        if (client_get_line_from_user(buffer, sizeof(buffer)) != 1)
         {
             printf("Unable to handle input.\n");
         }
@@ -73,7 +136,7 @@ static void cmd_loop(int sock_fd)
         {
             printf("Goodbye!\n");
             g_is_alive = 0;
-            status     = proto_disconnect_from_server(sock_fd,
+            status     = proto_disconnect_from_server(g_sock_fd,
                                                   "user initiated disconnect");
             if (status != OK)
             {
@@ -90,7 +153,7 @@ static void cmd_loop(int sock_fd)
         if (strcmp(buffer, "/getusers") == 0)
         {
             printf("Requesting user list from server\n");
-            status = proto_request_userlist_from_server(sock_fd);
+            status = proto_request_userlist_from_server(g_sock_fd);
             if (status != OK)
             {
                 printf("Unable to get userlist from server: %s\n",
@@ -98,69 +161,10 @@ static void cmd_loop(int sock_fd)
             }
         }
     }
+    return OK;
 }
 
-int main(int argc, char **argv)
-{
-    printf("Starting client...\n");
-
-    if (argc < 2)
-    {
-        printf("Usage: ./client <username>\n");
-        return -1;
-    }
-    int                port_no        = 5001;
-    int                sock_fd        = 0;
-    char               hostname[]     = "127.0.0.1";
-    struct sockaddr_in server_address = {0};
-
-    // initialize the server address structure
-    memset(&server_address, 0, sizeof(struct sockaddr_in));
-    server_address.sin_family = AF_INET;
-    server_address.sin_port   = htons(port_no);
-    if (inet_pton(AF_INET, hostname, &server_address.sin_addr) <= 0)
-    {
-        printf("inet_pton error occured: %s\n", strerror(errno));
-        return -1;
-    }
-
-    // create a socket to handle data
-    sock_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock_fd < 0)
-    {
-        printf("ERROR opening socket\n");
-        return -1;
-    }
-
-    // connect to the server address using the socket we created
-    if (connect(sock_fd, (struct sockaddr *)&server_address,
-                sizeof(struct sockaddr_in)) < 0)
-    {
-        printf("Error connecting: %s\n", strerror(errno));
-        return -1;
-    }
-
-    // the server will tell us something...
-    command_t cmd = {0};
-    read(sock_fd, &cmd, sizeof(command_t));
-    printf("Read command\n");
-    proto_print_command(&cmd);
-    if (cmd.command_type == CMD_REQUEST_NAME)
-    {
-        printf("Sending client name to server...\n");
-        // proto_send_client_name(sock_fd, "somedumuser",
-        // strlen("somedumbuser"));
-        proto_send_client_name(sock_fd, argv[1], strlen(argv[1]));
-    }
-
-    // kick off receive thread to handle receipt of data
-    pthread_create(&g_receive_thread, NULL, receive_function, &sock_fd);
-    // enter command loop to process user input
-    cmd_loop(sock_fd);
-    return 0;
-}
-
-void *receive_function(void *context)
+void *client_receive_function(void *context)
 {
     int         sock_fd = *(int *)context;
     proto_err_t status  = OK;
