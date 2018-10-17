@@ -64,7 +64,7 @@ static void server_init_client_sockets()
 
 /**
  * @brief remove a client from the server
- * 
+ *
  * @param user the user to remove
  */
 static void server_remove_user(user_t *user)
@@ -230,8 +230,8 @@ void server_handle_connections()
 {
     server_update_max_fd();
 
-    int num_ready_fd = wrappers_select(g_server_state.max_fd + 1,
-                              &g_server_state.all_fds, NULL, NULL, NULL);
+    int num_ready_fd = wrappers_select(
+        g_server_state.max_fd + 1, &g_server_state.all_fds, NULL, NULL, NULL);
     if (num_ready_fd < 0 && errno != EINTR)
     {
         DBG_INFO("Select error %d\n", errno);
@@ -292,13 +292,28 @@ void server_handle_connections()
             DBG_INFO("Status is %s, disconnecting client %s\n",
                      PROTO_ERR_T_STRING[status], user->name);
             server_remove_user(user);
-            continue;
         }
         else if (cmd->command_type == CMD_REQUEST_USERLIST_FROM_SERVER)
         {
             DBG_INFO("User [%s] requests user list from server...\n",
                      user->name);
             proto_send_user_list(sd, g_server_state.active_user_list);
+        }
+        else if (cmd->command_type == CMD_SEND_GLOBAL_MESSAGE)
+        {
+            DBG_INFO("User %s sent a message to everyone: %s\n", user->name,
+                     cmd->payload);
+            // send a message to *each* client
+            for (int j = 0; j < MAX_CLIENTS; j++)
+            {
+                if (server_get_client_socket(j) >= 0)
+                {
+                    DBG_INFO("username len %d payload len %d\n", strlen(user->name), strlen(cmd->payload));
+                    proto_broadcast_message(server_get_client_socket(j),
+                                            user->name, strlen(user->name),
+                                            cmd->payload, strlen(cmd->payload));
+                }
+            }
         }
         else
         {

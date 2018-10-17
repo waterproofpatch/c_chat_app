@@ -57,7 +57,8 @@ proto_err_t proto_read_command(int sock_fd, command_t **cmd_out)
 
     *cmd_out = NULL;
 
-    int bytes_wrappers_read = wrappers_read(sock_fd, &cmd_hdr, sizeof(command_t));
+    int bytes_wrappers_read =
+        wrappers_read(sock_fd, &cmd_hdr, sizeof(command_t));
     if (bytes_wrappers_read == 0)
     {
         printf("No more data. Remote host closed?\n");
@@ -76,26 +77,29 @@ proto_err_t proto_read_command(int sock_fd, command_t **cmd_out)
     if (cmd_hdr.payload_length > CMD_MAX_PAYLOAD_LENGTH - 1)
     {
         printf(
-            "Remote host wants to send too much payload data. Not wrappers_reading.\n");
-        return ERR_PAYLOAD_TOO_LARGE;   
+            "Remote host wants to send too much payload data. Not "
+            "wrappers_reading.\n");
+        return ERR_PAYLOAD_TOO_LARGE;
     }
     // now we know the size of the full resulting command, copy in header and
     // wrappers_read payload
-    result_command = wrappers_malloc(sizeof(command_t) + cmd_hdr.payload_length);
+    result_command =
+        wrappers_malloc(sizeof(command_t) + cmd_hdr.payload_length);
     if (!result_command)
     {
         printf("Unable to allocate command!\n");
         return ERR_NO_MEM;
     }
 
-    wrappers_memset(result_command, 0, sizeof(command_t) + cmd_hdr.payload_length);
+    wrappers_memset(result_command, 0,
+                    sizeof(command_t) + cmd_hdr.payload_length);
     // copy in the command header information
     wrappers_memcpy(result_command, &cmd_hdr, sizeof(command_t));
     if (cmd_hdr.payload_length > 0)
     {
         // wrappers_read payload information
-        if (wrappers_read(sock_fd, result_command->payload, cmd_hdr.payload_length) !=
-            cmd_hdr.payload_length)
+        if (wrappers_read(sock_fd, result_command->payload,
+                          cmd_hdr.payload_length) != cmd_hdr.payload_length)
         {
             printf("Unable to wrappers_read %d bytes from remote host\n",
                    cmd_hdr.payload_length);
@@ -109,7 +113,8 @@ proto_err_t proto_read_command(int sock_fd, command_t **cmd_out)
 
 void proto_print_command(command_t *command)
 {
-    if (command->command_type >= CMD_CANARY) {
+    if (command->command_type >= CMD_CANARY)
+    {
         printf("Command type %d is invalid.\n", command->command_type);
         return;
     }
@@ -179,8 +184,41 @@ proto_err_t proto_read_client_name(int sock_fd, char **name_out)
 
 done:
     // we're done with cmd_name, wrappers_free it
-    wrappers_free(cmd_name);
+    if (cmd_name)
+    {
+        wrappers_free(cmd_name);
+        cmd_name = NULL;
+    }
     return status;
+}
+
+proto_err_t proto_send_global_message(int sock_fd, char *buffer)
+{
+    return proto_send_command(sock_fd, CMD_SEND_GLOBAL_MESSAGE, buffer,
+                              strlen(buffer));
+}
+
+proto_err_t proto_broadcast_message(int    sock_fd,
+                                    char * name,
+                                    size_t name_length,
+                                    char * message,
+                                    size_t message_length)
+{
+    broadcast_message_t *broadcast_message =
+        wrappers_malloc(sizeof(broadcast_message_t) + message_length);
+
+    if (!broadcast_message)
+    {
+        return ERR_NO_MEM;
+    }
+    wrappers_memcpy(broadcast_message->name, name, name_length);
+    wrappers_memcpy(broadcast_message->message, message, message_length);
+    broadcast_message->message_length = message_length;
+    proto_err_t res                   = proto_send_command(
+        sock_fd, CMD_RECEIVE_GLOBAL_MESSAGE, (char *)broadcast_message,
+        sizeof(broadcast_message_t) + message_length);
+    wrappers_free(broadcast_message);
+    return res;
 }
 
 proto_err_t proto_request_userlist_from_server(int sock_fd)
@@ -219,7 +257,9 @@ proto_err_t proto_send_user_list(int sock_fd, list_t *user_list)
         strncpy(name_list->usernames[i], active_user->name,
                 MAX_USER_NAME_LENGTH);
     }
-    return proto_send_command(
+    proto_err_t res = proto_send_command(
         sock_fd, CMD_USER_LIST, (char *)name_list,
         sizeof(name_list_t) + (num_users * MAX_USER_NAME_LENGTH));
+    wrappers_free(name_list);
+    return res;
 }

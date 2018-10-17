@@ -112,7 +112,8 @@ proto_err_t client_connect(char *hostname, unsigned short port_no)
         return ERR_NETWORK_FAILURE;
     }
 
-    // connect to the server address using the socket we created TODO use wrappers
+    // connect to the server address using the socket we created TODO use
+    // wrappers
     if (connect(g_sock_fd, (struct sockaddr *)&server_address,
                 sizeof(struct sockaddr_in)) < 0)
     {
@@ -162,6 +163,16 @@ proto_err_t client_loop()
                        PROTO_ERR_T_STRING[status]);
             }
         }
+        else
+        {
+            printf("Sending message...\n");
+            status = proto_send_global_message(g_sock_fd, buffer);
+            if (status != OK)
+            {
+                printf("Unable to get send message to server: %s\n",
+                       PROTO_ERR_T_STRING[status]);
+            }
+        }
     }
     return OK;
 }
@@ -192,7 +203,8 @@ void *client_receive_function(void *context)
             }
             continue;
         }
-        name_list_t* name_list = NULL;
+        name_list_t *        name_list         = NULL;
+        broadcast_message_t *broadcast_message = NULL;
         switch (cmd->command_type)
         {
             case CMD_REQUEST_DISCONNECT:
@@ -208,6 +220,11 @@ void *client_receive_function(void *context)
                 {
                     printf("Name: [%s]\n", name_list->usernames[i]);
                 }
+                break;
+            case CMD_RECEIVE_GLOBAL_MESSAGE:
+                broadcast_message = (broadcast_message_t *)cmd->payload;
+                printf("Message from %s: %s\n", broadcast_message->name,
+                       broadcast_message->message);
                 break;
             default:
                 printf("unknown command %d\n", cmd->command_type);

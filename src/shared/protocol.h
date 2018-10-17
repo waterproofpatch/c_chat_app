@@ -25,6 +25,8 @@
     RENDER(CMD_RESPONSE_NAME)                \
     RENDER(CMD_REQUEST_USERLIST_FROM_SERVER) \
     RENDER(CMD_USER_LIST)                    \
+    RENDER(CMD_SEND_GLOBAL_MESSAGE)          \
+    RENDER(CMD_RECEIVE_GLOBAL_MESSAGE)       \
     RENDER(CMD_CANARY)                       \
     RENDER(CMD_PADDING = 0xffffffff)
 
@@ -53,6 +55,12 @@ typedef struct _name_list_t
     char usernames[MAX_CLIENTS][MAX_USER_NAME_LENGTH];
 } name_list_t;
 
+typedef struct _broadcast_message_t {
+    char name[MAX_USER_NAME_LENGTH];
+    size_t message_length;
+    char* message;
+} broadcast_message_t;
+
 /**
  * @brief handle reading a command
  * @param sock_fd: the socket to read the command from
@@ -80,6 +88,33 @@ proto_err_t proto_send_user_list(int sock_fd, list_t *user_list);
  * @param command: the command to print
  * */
 void proto_print_command(command_t *command);
+
+/**
+ * @brief send from the client to tell the server to send a global message
+ * 
+ * @param sock_fd the socket to send to
+ * @param buffer the buffer (ascii message)
+ * @return proto_err_t OK on success, ERR_* otherwise
+ */
+proto_err_t proto_send_global_message(int sock_fd, char *buffer);
+
+/**
+ * @brief sent from the server to all the connected clients to 
+ * pass a global message received from one of them
+ * 
+ * 
+ * @param sock_fd the socket to send to
+ * @param name the name of the sender
+ * @param name_length the length of the name of the sender
+ * @param message the message
+ * @param message_length the length of the message
+ * @return proto_err_t OK on success, ERR_* otherwise
+ */
+proto_err_t proto_broadcast_message(int    sock_fd,
+                                    char * name,
+                                    size_t name_length,
+                                    char * message,
+                                    size_t message_length);
 
 #ifdef TEST
 /**
