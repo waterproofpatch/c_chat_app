@@ -11,6 +11,7 @@
 #include "protocol.h"
 #include "user.h"
 #include "client.h"
+#include "wrappers.h"
 
 int          g_sock_fd;          // socket descriptor for the client connection
 pthread_t    g_receive_thread;   // thread to handle receiving data
@@ -19,7 +20,7 @@ volatile int g_is_alive =
 
 /**
  * @brief shameless SO copy pasta to read a line from stdin
- * 
+ *
  * @param buff buffer to fill with user data
  * @param buff_length length of the buffer
  * @return int 1 on success, -1 on failure
@@ -55,7 +56,7 @@ static int client_get_line_from_user(char *buff, size_t buff_length)
 
 /**
  * @brief print the available commands
- * 
+ *
  */
 static void client_print_commands()
 {
@@ -84,7 +85,8 @@ proto_err_t client_handshake(char *username)
     }
 
     // kick off receive thread to handle receipt of data
-    pthread_create(&g_receive_thread, NULL, client_receive_function, &g_sock_fd);
+    pthread_create(&g_receive_thread, NULL, client_receive_function,
+                   &g_sock_fd);
     return OK;
 }
 
@@ -103,14 +105,14 @@ proto_err_t client_connect(char *hostname, unsigned short port_no)
     }
 
     // create a socket to handle data
-    g_sock_fd = socket(AF_INET, SOCK_STREAM, 0);
+    g_sock_fd = wrappers_socket(AF_INET, SOCK_STREAM, 0);
     if (g_sock_fd < 0)
     {
         printf("ERROR opening socket\n");
         return ERR_NETWORK_FAILURE;
     }
 
-    // connect to the server address using the socket we created
+    // connect to the server address using the socket we created TODO use wrappers
     if (connect(g_sock_fd, (struct sockaddr *)&server_address,
                 sizeof(struct sockaddr_in)) < 0)
     {
@@ -168,11 +170,17 @@ void *client_receive_function(void *context)
 {
     int         sock_fd = *(int *)context;
     proto_err_t status  = OK;
+    command_t * cmd     = NULL;
     printf("Receive thread started...\n");
     while (g_is_alive)
     {
-        command_t *cmd = NULL;
-        status         = proto_read_command(sock_fd, &cmd);
+        // free any previously allocated command
+        if (cmd)
+        {
+            wrappers_free(cmd);
+            cmd = NULL;
+        }
+        status = proto_read_command(sock_fd, &cmd);
         if (status != OK)
         {
             printf("Failed reading a command: %s\n",
@@ -184,26 +192,33 @@ void *client_receive_function(void *context)
             }
             continue;
         }
-        printf("Read command from server.\n");
-        proto_print_command(cmd);
-        if (cmd->command_type == CMD_REQUEST_DISCONNECT)
+        name_list_t* name_list = NULL;
+        switch (cmd->command_type)
         {
-            printf(
-                "Server requested that we disconnect for reason %s. "
-                "Disconnecting...\n",
-                cmd->payload);
-            break;
+            case CMD_REQUEST_DISCONNECT:
+                printf(
+                    "Server requested that we disconnect for reason %s. "
+                    "Disconnecting...\n",
+                    cmd->payload);
+                break;
+            case CMD_USER_LIST:
+                name_list = (name_list_t *)cmd->payload;
+                printf("%d users connected:\n", name_list->num_names);
+                for (int i = 0; i < name_list->num_names; i++)
+                {
+                    printf("Name: [%s]\n", name_list->usernames[i]);
+                }
+                break;
+            default:
+                printf("unknown command %d\n", cmd->command_type);
+                break;
         }
-        else if (cmd->command_type == CMD_USER_LIST)
-        {
-            name_list_t *name_list = (name_list_t *)cmd->payload;
-            printf("%d users connected:\n", name_list->num_names);
-            for (int i = 0; i < name_list->num_names; i++)
-            {
-                printf("Name: [%s]\n", name_list->usernames[i]);
-            }
-        }
-    }
+    }   // end while alive loop
     printf("Receive thread terminating.\n");
+    if (cmd)
+    {
+        wrappers_free(cmd);
+        cmd = NULL;
+    }
     return NULL;
 }

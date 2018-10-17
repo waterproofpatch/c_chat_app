@@ -9,7 +9,6 @@
 #include "user.h"
 #include "list.h"
 
-// 'private' functions
 /**
  * @brief handle sending a command
  * @param sock_fd: the socket to send the command to
@@ -74,7 +73,6 @@ proto_err_t proto_read_command(int sock_fd, command_t **cmd_out)
         printf("Not enough data for a command\n");
         return ERR_INVALID_COMMAND;
     }
-    printf("Read command with payload length %d\n", cmd_hdr.payload_length);
     if (cmd_hdr.payload_length > CMD_MAX_PAYLOAD_LENGTH - 1)
     {
         printf(
@@ -96,7 +94,6 @@ proto_err_t proto_read_command(int sock_fd, command_t **cmd_out)
     if (cmd_hdr.payload_length > 0)
     {
         // wrappers_read payload information
-        printf("Attempting to wrappers_read %d payload bytes from server\n", cmd_hdr.payload_length);
         if (wrappers_read(sock_fd, result_command->payload, cmd_hdr.payload_length) !=
             cmd_hdr.payload_length)
         {
