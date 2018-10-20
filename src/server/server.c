@@ -342,32 +342,32 @@ proto_err_t server_create(unsigned short port_no)
     }
 
     // init socket structure
-    memset(&serv_addr, 0, sizeof(struct sockaddr_in));
+    wrappers_memset(&serv_addr, 0, sizeof(struct sockaddr_in));
 
     serv_addr.sin_family      = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
     serv_addr.sin_port        = htons(port_no);
 
     int enable = 1;
-    if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+    if (wrappers_setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
     {
         DBG_ERROR("Error setting sockopts.\n");
     }
-    if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(int)) < 0)
+    if (wrappers_setsockopt(sock_fd, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(int)) < 0)
     {
         DBG_ERROR("Error setting sockopts.\n");
     }
 
     // bind our socket file descriptor to the host address so it is notified of
     // inbound traffic/events...
-    if (bind(sock_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+    if (wrappers_bind(sock_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
     {
         DBG_ERROR("ERROR on binding: %s\n", strerror(errno));
         return ERR_NETWORK_FAILURE;
     }
 
     // listen on the socket
-    if (listen(sock_fd, 5) < 0)
+    if (wrappers_listen(sock_fd, 5) < 0)
     {
         DBG_ERROR("ERROR listening\n");
         return ERR_NETWORK_FAILURE;

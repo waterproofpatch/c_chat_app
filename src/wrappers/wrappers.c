@@ -15,6 +15,43 @@ void wrappers_free(void* p)
     return free(p);
 }
 
+
+int wrappers_bind(int                    socket,
+                  const struct sockaddr* address,
+                  socklen_t              address_len)
+{
+    return bind(socket, address, address_len);
+}
+
+int wrappers_connect(int                    socket,
+                     const struct sockaddr *address,
+                     socklen_t              address_len)
+{
+    return connect(socket, address, address_len);
+}
+
+int wrappers_listen(int socket, int backlog)
+{
+    return listen(socket, backlog);
+}
+
+int wrappers_setsockopt(int         socket,
+                        int         level,
+                        int         option_name,
+                        const void* option_value,
+                        socklen_t   option_len)
+{
+    return setsockopt(socket, level, option_name, option_value, option_len);
+}
+int wrappers_getsockopt(int        socket,
+                        int        level,
+                        int        option_name,
+                        void*      option_value,
+                        socklen_t* option_len)
+{
+    return getsockopt(socket, level, option_name, option_value, option_len);
+}
+
 void* wrappers_memset(void* b, int c, size_t len)
 {
     return memset(b, c, len);
