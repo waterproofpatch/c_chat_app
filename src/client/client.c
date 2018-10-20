@@ -114,8 +114,8 @@ proto_err_t client_connect(char *hostname, unsigned short port_no)
 
     // connect to the server address using the socket we created TODO use
     // wrappers
-    if (connect(g_sock_fd, (struct sockaddr *)&server_address,
-                sizeof(struct sockaddr_in)) < 0)
+    if (wrappers_connect(g_sock_fd, (struct sockaddr *)&server_address,
+                         sizeof(struct sockaddr_in)) < 0)
     {
         printf("Error connecting: %s\n", strerror(errno));
         return ERR_NETWORK_FAILURE;
