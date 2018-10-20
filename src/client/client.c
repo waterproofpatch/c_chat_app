@@ -165,7 +165,6 @@ proto_err_t client_loop()
         }
         else
         {
-            printf("Sending message...\n");
             status = proto_send_global_message(g_sock_fd, buffer);
             if (status != OK)
             {
@@ -223,7 +222,7 @@ void *client_receive_function(void *context)
                 break;
             case CMD_RECEIVE_GLOBAL_MESSAGE:
                 broadcast_message = (broadcast_message_t *)cmd->payload;
-                printf("Message from %s: %s\n", broadcast_message->name,
+                printf("%s: %s\n", broadcast_message->name,
                        broadcast_message->message);
                 break;
             default:
