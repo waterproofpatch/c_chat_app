@@ -53,7 +53,7 @@ ssize_t read_callback_more_than_max_payload(int fd, void* buf_out, size_t size, 
         TEST_ASSERT_EQUAL(2, fd);
         TEST_ASSERT_EQUAL(sizeof(command_t), size);
         command_t* ptr_command      = (command_t*)buf_out;
-        ptr_command->command_type   = CMD_RESPONSE_NAME;
+        ptr_command->command_type   = CMD_CLIENT_RESPONSE_NAME;
         ptr_command->payload_length = CMD_MAX_PAYLOAD_LENGTH + 1;
         return sizeof(command_t);
     } else {
@@ -71,7 +71,7 @@ ssize_t read_callback_second_time_too_few_bytes(int fd, void* buf_out, size_t si
         TEST_ASSERT_EQUAL(2, fd);
         TEST_ASSERT_EQUAL(sizeof(command_t), size);
         command_t* ptr_command      = (command_t*)buf_out;
-        ptr_command->command_type   = CMD_RESPONSE_NAME;
+        ptr_command->command_type   = CMD_CLIENT_RESPONSE_NAME;
         ptr_command->payload_length = strlen("testname");
         return sizeof(command_t);
     }
@@ -99,7 +99,7 @@ ssize_t read_callback(int fd, void* buf_out, size_t size, int num_calls)
         TEST_ASSERT_EQUAL(2, fd);
         TEST_ASSERT_EQUAL(sizeof(command_t), size);
         command_t* ptr_command      = (command_t*)buf_out;
-        ptr_command->command_type   = CMD_RESPONSE_NAME;
+        ptr_command->command_type   = CMD_CLIENT_RESPONSE_NAME;
         ptr_command->payload_length = strlen("testname");
         return sizeof(command_t);
     }

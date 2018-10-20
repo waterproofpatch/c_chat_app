@@ -71,7 +71,7 @@ proto_err_t client_handshake(char *username)
     // the server will tell us something...
     command_t cmd = {0};
     read(g_sock_fd, &cmd, sizeof(command_t));
-    if (cmd.command_type == CMD_REQUEST_NAME)
+    if (cmd.command_type == CMD_SERVER_REQUEST_NAME)
     {
         printf("Sending client name to server...\n");
         // proto_send_client_name(sock_fd, "somedumuser",
@@ -206,13 +206,13 @@ void *client_receive_function(void *context)
         broadcast_message_t *broadcast_message = NULL;
         switch (cmd->command_type)
         {
-            case CMD_REQUEST_DISCONNECT:
+            case CMD_SHARED_REQUEST_DISCONNECT:
                 printf(
                     "Server requested that we disconnect for reason %s. "
                     "Disconnecting...\n",
                     cmd->payload);
                 break;
-            case CMD_USER_LIST:
+            case CMD_SERVER_USER_LIST:
                 name_list = (name_list_t *)cmd->payload;
                 printf("%d users connected:\n", name_list->num_names);
                 for (int i = 0; i < name_list->num_names; i++)
@@ -220,7 +220,7 @@ void *client_receive_function(void *context)
                     printf("Name: [%s]\n", name_list->usernames[i]);
                 }
                 break;
-            case CMD_RECEIVE_GLOBAL_MESSAGE:
+            case CMD_SERVER_BROADCAST_MESSAGE:
                 broadcast_message = (broadcast_message_t *)cmd->payload;
                 printf("%s: %s\n", broadcast_message->name,
                        broadcast_message->message);

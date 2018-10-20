@@ -6,8 +6,8 @@
 #include "list.h"
 #include "error_codes.h"
 
-#define MAX_CLIENTS 10 // maximum number of clients we allow to be connected
-#define MAX_MESSAGE_LENGTH 3000 // maximum length for a message
+#define MAX_CLIENTS 10   // maximum number of clients we allow to be connected
+#define MAX_MESSAGE_LENGTH 3000   // maximum length for a message
 
 // conditional static for test
 #ifndef TEST
@@ -20,15 +20,15 @@
     1000   // the maximum length allowed for any command payload
 #define CMD_MAX_NAME_LENGTH 20   // max length for a command name string
 
-#define FOREACH_COMMAND_TYPE(RENDER)         \
-    RENDER(CMD_REQUEST_NAME)                 \
-    RENDER(CMD_REQUEST_DISCONNECT)           \
-    RENDER(CMD_RESPONSE_NAME)                \
-    RENDER(CMD_REQUEST_USERLIST_FROM_SERVER) \
-    RENDER(CMD_USER_LIST)                    \
-    RENDER(CMD_SEND_GLOBAL_MESSAGE)          \
-    RENDER(CMD_RECEIVE_GLOBAL_MESSAGE)       \
-    RENDER(CMD_CANARY)                       \
+#define FOREACH_COMMAND_TYPE(RENDER)                \
+    RENDER(CMD_SERVER_REQUEST_NAME)                 \
+    RENDER(CMD_SHARED_REQUEST_DISCONNECT)           \
+    RENDER(CMD_CLIENT_RESPONSE_NAME)                \
+    RENDER(CMD_CLIENT_REQUEST_USERLIST_FROM_SERVER) \
+    RENDER(CMD_SERVER_USER_LIST)                    \
+    RENDER(CMD_CLIENT_BROADCAST_MESSAGE)            \
+    RENDER(CMD_SERVER_BROADCAST_MESSAGE)            \
+    RENDER(CMD_CANARY)                              \
     RENDER(CMD_PADDING = 0xffffffff)
 
 #define GENERATE_ENUM(ENUM) ENUM,
@@ -56,10 +56,11 @@ typedef struct _name_list_t
     char usernames[MAX_CLIENTS][MAX_USER_NAME_LENGTH];
 } name_list_t;
 
-typedef struct _broadcast_message_t {
-    char name[MAX_USER_NAME_LENGTH];
+typedef struct _broadcast_message_t
+{
+    char   name[MAX_USER_NAME_LENGTH];
     size_t message_length;
-    char message[0];
+    char   message[0];
 } broadcast_message_t;
 
 /**
@@ -92,7 +93,7 @@ void proto_print_command(command_t *command);
 
 /**
  * @brief send from the client to tell the server to send a global message
- * 
+ *
  * @param sock_fd the socket to send to
  * @param buffer the buffer (ascii message)
  * @return proto_err_t OK on success, ERR_* otherwise
@@ -100,10 +101,10 @@ void proto_print_command(command_t *command);
 proto_err_t proto_send_global_message(int sock_fd, char *buffer);
 
 /**
- * @brief sent from the server to all the connected clients to 
+ * @brief sent from the server to all the connected clients to
  * pass a global message received from one of them
- * 
- * 
+ *
+ *
  * @param sock_fd the socket to send to
  * @param name the name of the sender
  * @param name_length the length of the name of the sender

@@ -25,9 +25,14 @@ server:
 
 .PHONY: test
 test:
+	mkdir -p test/support # required for ceedling to run
 	ceedling clobber # remove all build artifacts from last test
 	ceedling gcov:all # run test and generate coverage metrics
 	ceedling utils:gcov # convert coverage metrics to html
+
+install:
+	sudo gem install ceedling
+	sudo pip3 install gcovr
 
 clean:
 	@rm -rf $(BIN)
