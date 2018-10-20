@@ -215,6 +215,7 @@ proto_err_t proto_broadcast_message(int    sock_fd,
     {
         return ERR_NO_MEM;
     }
+    wrappers_memset(broadcast_message, 0, sizeof(broadcast_message_t) + message_length + 1);
     wrappers_memset(broadcast_message->name, '\0', MAX_USER_NAME_LENGTH);
     wrappers_memset(broadcast_message->message, '\0', message_length + 1);
     wrappers_memcpy(broadcast_message->name, name, name_length);
