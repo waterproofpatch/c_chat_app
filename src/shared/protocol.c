@@ -132,7 +132,7 @@ void proto_print_command(command_t *command)
 proto_err_t proto_disconnect_client(int sock_fd, char *reason)
 {
     proto_err_t status = OK;
-    status = proto_send_command(sock_fd, CMD_REQUEST_DISCONNECT, reason,
+    status = proto_send_command(sock_fd, CMD_SHARED_REQUEST_DISCONNECT, reason,
                                 strlen(reason));
     return status;
 }
@@ -140,7 +140,7 @@ proto_err_t proto_disconnect_client(int sock_fd, char *reason)
 proto_err_t proto_disconnect_from_server(int sock_fd, char *reason)
 {
     proto_err_t status = OK;
-    status = proto_send_command(sock_fd, CMD_REQUEST_DISCONNECT, reason,
+    status = proto_send_command(sock_fd, CMD_SHARED_REQUEST_DISCONNECT, reason,
                                 strlen(reason));
     return status;
 }
@@ -157,9 +157,9 @@ proto_err_t proto_read_client_name(int sock_fd, char **name_out)
         printf("Unable to wrappers_read client name.\n");
         goto done;
     }
-    if (cmd_name->command_type != CMD_RESPONSE_NAME)
+    if (cmd_name->command_type != CMD_CLIENT_RESPONSE_NAME)
     {
-        printf("Command is not CMD_RESPONSE_NAME\n");
+        printf("Command is not response to name request\n");
         status = ERR_INVALID_COMMAND;
         goto done;
     }
@@ -194,7 +194,7 @@ done:
 
 proto_err_t proto_send_global_message(int sock_fd, char *buffer)
 {
-    return proto_send_command(sock_fd, CMD_SEND_GLOBAL_MESSAGE, buffer,
+    return proto_send_command(sock_fd, CMD_CLIENT_BROADCAST_MESSAGE, buffer,
                               strlen(buffer));
 }
 
@@ -215,14 +215,15 @@ proto_err_t proto_broadcast_message(int    sock_fd,
     {
         return ERR_NO_MEM;
     }
-    wrappers_memset(broadcast_message, 0, sizeof(broadcast_message_t) + message_length + 1);
+    wrappers_memset(broadcast_message, 0,
+                    sizeof(broadcast_message_t) + message_length + 1);
     wrappers_memset(broadcast_message->name, '\0', MAX_USER_NAME_LENGTH);
     wrappers_memset(broadcast_message->message, '\0', message_length + 1);
     wrappers_memcpy(broadcast_message->name, name, name_length);
     wrappers_memcpy(broadcast_message->message, message, message_length);
     broadcast_message->message_length = message_length;
     proto_err_t res                   = proto_send_command(
-        sock_fd, CMD_RECEIVE_GLOBAL_MESSAGE, (char *)broadcast_message,
+        sock_fd, CMD_SERVER_BROADCAST_MESSAGE, (char *)broadcast_message,
         sizeof(broadcast_message_t) + message_length + 1);
     wrappers_free(broadcast_message);
     return res;
@@ -230,17 +231,17 @@ proto_err_t proto_broadcast_message(int    sock_fd,
 
 proto_err_t proto_request_userlist_from_server(int sock_fd)
 {
-    return proto_send_command(sock_fd, CMD_REQUEST_USERLIST_FROM_SERVER, NULL,
+    return proto_send_command(sock_fd, CMD_CLIENT_REQUEST_USERLIST_FROM_SERVER, NULL,
                               0);
 }
 proto_err_t proto_request_client_name(int sock_fd)
 {
-    return proto_send_command(sock_fd, CMD_REQUEST_NAME, NULL, 0);
+    return proto_send_command(sock_fd, CMD_SERVER_REQUEST_NAME, NULL, 0);
 }
 
 proto_err_t proto_send_client_name(int sock_fd, char *name, size_t name_length)
 {
-    return proto_send_command(sock_fd, CMD_RESPONSE_NAME, name, name_length);
+    return proto_send_command(sock_fd, CMD_CLIENT_RESPONSE_NAME, name, name_length);
 }
 
 proto_err_t proto_send_user_list(int sock_fd, list_t *user_list)
@@ -265,7 +266,7 @@ proto_err_t proto_send_user_list(int sock_fd, list_t *user_list)
                 MAX_USER_NAME_LENGTH);
     }
     proto_err_t res = proto_send_command(
-        sock_fd, CMD_USER_LIST, (char *)name_list,
+        sock_fd, CMD_SERVER_USER_LIST, (char *)name_list,
         sizeof(name_list_t) + (num_users * MAX_USER_NAME_LENGTH));
     wrappers_free(name_list);
     return res;

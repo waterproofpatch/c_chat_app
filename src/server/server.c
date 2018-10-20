@@ -287,19 +287,19 @@ void server_handle_connections()
         command_t * cmd    = NULL;
         proto_err_t status = OK;
         status             = proto_read_command(sd, &cmd);
-        if (status != OK || cmd->command_type == CMD_REQUEST_DISCONNECT)
+        if (status != OK || cmd->command_type == CMD_SHARED_REQUEST_DISCONNECT)
         {
             DBG_INFO("Status is %s, disconnecting client %s\n",
                      PROTO_ERR_T_STRING[status], user->name);
             server_remove_user(user);
         }
-        else if (cmd->command_type == CMD_REQUEST_USERLIST_FROM_SERVER)
+        else if (cmd->command_type == CMD_CLIENT_REQUEST_USERLIST_FROM_SERVER)
         {
             DBG_INFO("User [%s] requests user list from server...\n",
                      user->name);
             proto_send_user_list(sd, g_server_state.active_user_list);
         }
-        else if (cmd->command_type == CMD_SEND_GLOBAL_MESSAGE)
+        else if (cmd->command_type == CMD_CLIENT_BROADCAST_MESSAGE)
         {
             DBG_INFO("User %s sent a message to everyone: %s\n", user->name,
                      cmd->payload);
