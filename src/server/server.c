@@ -308,7 +308,6 @@ void server_handle_connections()
             {
                 if (server_get_client_socket(j) >= 0)
                 {
-                    DBG_INFO("username len %d payload len %d\n", strlen(user->name), strlen(cmd->payload));
                     proto_broadcast_message(server_get_client_socket(j),
                                             user->name, strlen(user->name),
                                             cmd->payload, strlen(cmd->payload));

@@ -58,7 +58,7 @@ typedef struct _name_list_t
 typedef struct _broadcast_message_t {
     char name[MAX_USER_NAME_LENGTH];
     size_t message_length;
-    char* message;
+    char message[0];
 } broadcast_message_t;
 
 /**
