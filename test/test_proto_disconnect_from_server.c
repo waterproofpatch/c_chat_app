@@ -13,7 +13,7 @@
 // protocol
 #include "protocol.h"
 
-static char* g_ptr;
+static char *g_ptr;
 
 void setUp()
 {
@@ -24,16 +24,18 @@ void tearDown()
 {
 }
 
-
-void* malloc_callback(size_t size, int num_calls) {
+void *malloc_callback(size_t size, int num_calls)
+{
     return g_ptr;
 }
 
-void* memcpy_callback(void* dst, void* src, size_t n, int num_calls) {
+void *memcpy_callback(void *dst, void *src, size_t n, int num_calls)
+{
     return memcpy(dst, src, n);
 }
 
-void* memset_callback(void* dst, int c, size_t n, int num_calls) {
+void *memset_callback(void *dst, int c, size_t n, int num_calls)
+{
     return memset(dst, c, n);
 }
 
@@ -43,7 +45,9 @@ void* memset_callback(void* dst, int c, size_t n, int num_calls) {
  */
 void test_proto_disconnect_from_server()
 {
-    wrappers_write_ExpectAndReturn(2, g_ptr, sizeof(command_t) + strlen("some_reason"), sizeof(command_t) + strlen("some_reason"));
+    wrappers_write_ExpectAndReturn(2, g_ptr,
+                                   sizeof(command_t) + strlen("some_reason"),
+                                   sizeof(command_t) + strlen("some_reason"));
     wrappers_malloc_StubWithCallback(malloc_callback);
     wrappers_memset_StubWithCallback(memset_callback);
     wrappers_memcpy_StubWithCallback(memcpy_callback);

@@ -75,7 +75,7 @@ proto_err_t proto_read_command(int sock_fd, command_t **cmd_out)
         printf("Not enough data for a command\n");
         return ERR_INVALID_COMMAND;
     }
-    if (cmd_hdr.payload_length > CMD_MAX_PAYLOAD_LENGTH - 1)
+    if (cmd_hdr.payload_length > MAX_PAYLOAD_LENGTH - 1)
     {
         printf(
             "Remote host wants to send too much payload data. Not "
@@ -123,7 +123,7 @@ void proto_print_command(command_t *command)
            COMMAND_TYPE_T_STRING[command->command_type]);
     printf("command->payload_length: %d\n", command->payload_length);
     int i;
-    for (i = 0; i <= CMD_MAX_PAYLOAD_LENGTH && i < command->payload_length; i++)
+    for (i = 0; i <= MAX_PAYLOAD_LENGTH && i < command->payload_length; i++)
     {
         printf("[0x%02x] ", command->payload[i]);
     }
@@ -232,8 +232,8 @@ proto_err_t proto_broadcast_message(int    sock_fd,
 
 proto_err_t proto_request_userlist_from_server(int sock_fd)
 {
-    return proto_send_command(sock_fd, CMD_CLIENT_REQUEST_USERLIST_FROM_SERVER, NULL,
-                              0);
+    return proto_send_command(sock_fd, CMD_CLIENT_REQUEST_USERLIST_FROM_SERVER,
+                              NULL, 0);
 }
 proto_err_t proto_request_client_name(int sock_fd)
 {
@@ -242,7 +242,8 @@ proto_err_t proto_request_client_name(int sock_fd)
 
 proto_err_t proto_send_client_name(int sock_fd, char *name, size_t name_length)
 {
-    return proto_send_command(sock_fd, CMD_CLIENT_RESPONSE_NAME, name, name_length);
+    return proto_send_command(sock_fd, CMD_CLIENT_RESPONSE_NAME, name,
+                              name_length);
 }
 
 proto_err_t proto_send_user_list(int sock_fd, list_t *user_list)

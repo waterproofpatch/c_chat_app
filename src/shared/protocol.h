@@ -1,7 +1,8 @@
-#ifndef __PROTOCOL_H_
-#define __PROTOCOL_H_
+#ifndef _PROTOCOL_H_
+#define _PROTOCOL_H_
 
 #include <stdlib.h>
+
 #include "user.h"
 #include "list.h"
 #include "error_codes.h"
@@ -132,4 +133,4 @@ STATIC proto_err_t proto_send_command(int            sock_fd,
                                       size_t         payload_length);
 #endif
 
-#endif   // __PROTOCOL_H_
+#endif   // _PROTOCOL_H_

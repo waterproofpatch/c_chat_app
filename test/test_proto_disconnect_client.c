@@ -13,7 +13,7 @@
 // protocol
 #include "protocol.h"
 
-static char* g_ptr;
+static char *g_ptr;
 
 void setUp()
 {
@@ -24,17 +24,17 @@ void tearDown()
 {
 }
 
-void* malloc_callback(size_t size, int num_calls)
+void *malloc_callback(size_t size, int num_calls)
 {
     return g_ptr;
 }
 
-void* memcpy_callback(void* dst, void* src, size_t n, int num_calls)
+void *memcpy_callback(void *dst, void *src, size_t n, int num_calls)
 {
     return memcpy(dst, src, n);
 }
 
-void* memset_callback(void* dst, int c, size_t n, int num_calls)
+void *memset_callback(void *dst, int c, size_t n, int num_calls)
 {
     return memset(dst, c, n);
 }

@@ -27,10 +27,10 @@ void tearDown()
  */
 void test_proto_print_command()
 {
-    command_t* cmd    = malloc(sizeof(command_t) + CMD_MAX_PAYLOAD_LENGTH - 1);
+    command_t *cmd    = malloc(sizeof(command_t) + MAX_PAYLOAD_LENGTH - 1);
     cmd->command_type = CMD_CANARY - 1;
-    memset(cmd->payload, 0, CMD_MAX_PAYLOAD_LENGTH - 1);
-    cmd->payload_length = CMD_MAX_PAYLOAD_LENGTH - 1;
+    memset(cmd->payload, 0, MAX_PAYLOAD_LENGTH - 1);
+    cmd->payload_length = MAX_PAYLOAD_LENGTH - 1;
     proto_print_command(cmd);
 
     free(cmd);
@@ -42,10 +42,10 @@ void test_proto_print_command()
  */
 void test_proto_print_command_invalid_command_type()
 {
-    command_t* cmd    = malloc(sizeof(command_t) + CMD_MAX_PAYLOAD_LENGTH - 1);
-    cmd->command_type = CMD_CANARY + 1;
-    cmd->payload_length = CMD_MAX_PAYLOAD_LENGTH - 1;
-    memset(cmd->payload, 0, CMD_MAX_PAYLOAD_LENGTH - 1);
+    command_t *cmd      = malloc(sizeof(command_t) + MAX_PAYLOAD_LENGTH - 1);
+    cmd->command_type   = CMD_CANARY + 1;
+    cmd->payload_length = MAX_PAYLOAD_LENGTH - 1;
+    memset(cmd->payload, 0, MAX_PAYLOAD_LENGTH - 1);
     proto_print_command(cmd);
 
     free(cmd);
