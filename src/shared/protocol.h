@@ -8,6 +8,9 @@
 
 #define MAX_CLIENTS 10   // maximum number of clients we allow to be connected
 #define MAX_MESSAGE_LENGTH 3000   // maximum length for a message
+#define MAX_PAYLOAD_LENGTH \
+    1000   // the maximum length allowed for any command payload
+#define CMD_MAX_NAME_LENGTH 20   // max length for a command name string
 
 // conditional static for test
 #ifndef TEST
@@ -15,10 +18,6 @@
 #else
 #define STATIC
 #endif
-
-#define CMD_MAX_PAYLOAD_LENGTH \
-    1000   // the maximum length allowed for any command payload
-#define CMD_MAX_NAME_LENGTH 20   // max length for a command name string
 
 #define FOREACH_COMMAND_TYPE(RENDER)                \
     RENDER(CMD_SERVER_REQUEST_NAME)                 \
