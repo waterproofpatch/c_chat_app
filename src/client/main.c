@@ -20,8 +20,8 @@ int main(int argc, char **argv)
         printf("Usage: ./client <username>\n");
         return -1;
     }
-    unsigned short  port_no    = 5001;
-    char hostname[] = "127.0.0.1";
+    unsigned short port_no    = 5001;
+    char           hostname[] = "127.0.0.1";
 
     proto_err_t res = OK;
     res             = client_connect(hostname, port_no);
