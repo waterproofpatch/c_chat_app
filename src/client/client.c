@@ -18,6 +18,11 @@ pthread_t    g_receive_thread;   // thread to handle receiving data
 volatile int g_is_alive =
     1;   // global to keep listen thread alive, volatile to ensure cache flush
 
+static void print_prompt()
+{
+    printf("%s", "> ");
+    fflush(stdout);
+}
 /**
  * @brief shameless SO copy pasta to read a line from stdin
  *
@@ -30,8 +35,7 @@ static int client_get_line_from_user(char *buff, size_t buff_length)
     int ch, extra;
 
     // get line with buffer overrun protection.
-    printf("%s", "> ");
-    fflush(stdout);
+    print_prompt();
     if (fgets(buff, buff_length, stdin) == NULL)
     {
         return -1;
@@ -85,8 +89,8 @@ proto_err_t client_handshake(char *username)
     }
 
     // kick off receive thread to handle receipt of data
-    pthread_create(&g_receive_thread, NULL, client_receive_function,
-                   &g_sock_fd);
+    pthread_create(
+        &g_receive_thread, NULL, client_receive_function, &g_sock_fd);
     return OK;
 }
 
@@ -114,7 +118,8 @@ proto_err_t client_connect(char *hostname, unsigned short port_no)
 
     // connect to the server address using the socket we created TODO use
     // wrappers
-    if (wrappers_connect(g_sock_fd, (struct sockaddr *)&server_address,
+    if (wrappers_connect(g_sock_fd,
+                         (struct sockaddr *)&server_address,
                          sizeof(struct sockaddr_in)) < 0)
     {
         printf("Error connecting: %s\n", strerror(errno));
@@ -190,6 +195,7 @@ void *client_receive_function(void *context)
             wrappers_free(cmd);
             cmd = NULL;
         }
+        print_prompt();
         status = proto_read_command(sock_fd, &cmd);
         if (status != OK)
         {
@@ -222,7 +228,8 @@ void *client_receive_function(void *context)
                 break;
             case CMD_SERVER_BROADCAST_MESSAGE:
                 broadcast_message = (broadcast_message_t *)cmd->payload;
-                printf("%s: %s\n", broadcast_message->name,
+                printf("%s: %s\n",
+                       broadcast_message->name,
                        broadcast_message->message);
                 break;
             default:
