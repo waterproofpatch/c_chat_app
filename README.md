@@ -4,8 +4,8 @@ Application for a C based centralized chat server.
 
 ## Prerequisites
 
-* ceedling (for CMock)
-* gcc (for compilation)
+- ceedling (for CMock)
+- gcc (for compilation)
 
 ```bash
 make install
@@ -18,6 +18,7 @@ make
 ```
 
 ## Run
+
 Start the server, then connect with one or more clients:
 
 ```bash
