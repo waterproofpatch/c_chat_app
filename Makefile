@@ -33,6 +33,7 @@ test:
 install:
 	sudo gem install ceedling
 	sudo pip3 install gcovr
+	pip install -r requirements.txt
 
 clean:
 	@rm -rf $(BIN)

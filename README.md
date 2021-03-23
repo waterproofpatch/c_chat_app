@@ -8,6 +8,7 @@ Application for a C based centralized chat server.
 - gcc (for compilation)
 
 ```bash
+source venv/bin/activate
 make install
 ```
 
@@ -31,8 +32,16 @@ Start the server, then connect with one or more clients:
 
 ## Test
 
+Unit tests:
+
 ```bash
 make test
+```
+
+Integration tests:
+
+```bash
+python -m pytest test
 ```
 
 View the coverage results as HTML in build/artifacts/gcov/GcovCoverageResults.html
