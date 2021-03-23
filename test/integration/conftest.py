@@ -5,6 +5,7 @@ import pexpect
 from typing import Generator
 
 from test.integration.classes.server import Server
+from test.integration.classes.server import Client
 
 
 @pytest.fixture(scope="function")
@@ -15,8 +16,17 @@ def client():
 
 @pytest.fixture(scope="function")
 def server():
-    server_path = Path("bin", "server", "server.bin")
-    assert server_path.exists(), f"{server_path} does not exist!"
+    path = Path("bin", "server", "server.bin")
+    assert path.exists(), f"{path} does not exist!"
 
-    with Server(server_path) as s:
+    with Server(path) as s:
+        yield s
+
+
+@pytest.fixture(scope="function")
+def client():
+    path = Path("bin", "client", "client.bin")
+    assert path.exists(), f"{path} does not exist!"
+
+    with Client(path, name="test_client") as s:
         yield s
