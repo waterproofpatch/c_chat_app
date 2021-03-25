@@ -18,6 +18,8 @@
 
 #include "error_codes.h"
 #include "server.h"
+#include "serverCreate.h"
+#include "serverHandleConnections.h"
 
 int main(int argc, char *argv[])
 {
@@ -27,7 +29,7 @@ int main(int argc, char *argv[])
 
     // create the server
     DBG_INFO("server running on port %d\n", port_no);
-    status = server_create(port_no);
+    status = serverCreate(port_no);
     if (status != OK)
     {
         DBG_INFO("Unable to create server: %s\n", PROTO_ERR_T_STRING[status]);
@@ -36,7 +38,7 @@ int main(int argc, char *argv[])
 
     while (1)
     {
-        server_handle_connections();
+        serverHandleConnections();
     }
     return 0;
 }

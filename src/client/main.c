@@ -8,6 +8,9 @@
 #include <pthread.h>
 #include <unistd.h>
 
+#include "clientHandshake.h"
+#include "clientLoop.h"
+#include "clientConnect.h"
 #include "error_codes.h"
 #include "client.h"
 
@@ -24,20 +27,20 @@ int main(int argc, char **argv)
     char           hostname[] = "127.0.0.1";
 
     proto_err_t res = OK;
-    res             = client_connect(hostname, port_no);
+    res             = clientConnect(hostname, port_no);
     if (OK != res)
     {
         printf("Unable to connect: %s\n", PROTO_ERR_T_STRING[res]);
     }
 
     // send name to server
-    res = client_handshake(argv[1]);
+    res = clientHandshake(argv[1]);
     if (OK != res)
     {
         printf("Unable to complete handshake: %s\n", PROTO_ERR_T_STRING[res]);
     }
 
-    res = client_loop();
+    res = clientLoop();
     if (OK != res)
     {
         printf("Unable to continue maun loop: %s\n", PROTO_ERR_T_STRING[res]);

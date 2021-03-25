@@ -6,7 +6,26 @@
 	],
 	"settings": {
 		"files.associations": {
-			"clientgetlinefromuser.h": "c"
+			"clientgetlinefromuser.h": "c",
+			"istream": "c",
+			"locale": "c",
+			"*.tcc": "c",
+			"iosfwd": "c",
+			"limits": "c",
+			"sstream": "c",
+			"stop_token": "c",
+			"streambuf": "c",
+			"protocol.h": "c",
+			"user.h": "c",
+			"error_codes.h": "c",
+			"protosendcommand.h": "c",
+			"protodisconnectfromserver.h": "c",
+			"protorequestuserlistfromserver.h": "c",
+			"protosenduserlist.h": "c",
+			"clientloop.h": "c",
+			"clientconnect.h": "c",
+			"cstring": "c",
+			"serverhandleconnections.h": "c"
 		}
 	}
 }
