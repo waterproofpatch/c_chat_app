@@ -8,6 +8,9 @@
 #include <pthread.h>
 #include <unistd.h>
 
+#include "clientGetLineFromUser.h"
+#include "clientPrintPrompt.h"
+#include "clientPrintCommands.h"
 #include "protocol.h"
 #include "user.h"
 #include "client.h"
@@ -17,58 +20,6 @@ int          g_sock_fd;          // socket descriptor for the client connection
 pthread_t    g_receive_thread;   // thread to handle receiving data
 volatile int g_is_alive =
     1;   // global to keep listen thread alive, volatile to ensure cache flush
-
-static void print_prompt()
-{
-    printf("%s", "> ");
-    fflush(stdout);
-}
-/**
- * @brief shameless SO copy pasta to read a line from stdin
- *
- * @param buff buffer to fill with user data
- * @param buff_length length of the buffer
- * @return int 1 on success, -1 on failure
- */
-static int client_get_line_from_user(char *buff, size_t buff_length)
-{
-    int ch, extra;
-
-    // get line with buffer overrun protection.
-    print_prompt();
-    if (fgets(buff, buff_length, stdin) == NULL)
-    {
-        return -1;
-    }
-
-    // if it was too long, there'll be no newline. In that case, we flush
-    // to end of line so that excess doesn't affect the next call.
-    if (buff[strlen(buff) - 1] != '\n')
-    {
-        extra = 0;
-        while (((ch = getchar()) != '\n') && (ch != EOF))
-        {
-            extra = 1;
-        }
-        return (extra == 1) ? -1 : 1;
-    }
-
-    // otherwise remove newline and give string back to caller.
-    buff[strlen(buff) - 1] = '\0';
-    return 1;
-}
-
-/**
- * @brief print the available commands
- *
- */
-static void client_print_commands()
-{
-    printf("Available commands:\n");
-    printf("/getusers - Get list of conneted users\n");
-    printf("/quit - Disconnect from server\n");
-    printf("@<username> - PM a user\n");
-}
 
 proto_err_t client_handshake(char *username)
 {
@@ -130,12 +81,12 @@ proto_err_t client_connect(char *hostname, unsigned short port_no)
 
 proto_err_t client_loop()
 {
-    client_print_commands();
+    clientPrintCommands();
     while (1)
     {
         char        buffer[256];
         proto_err_t status = OK;
-        if (client_get_line_from_user(buffer, sizeof(buffer)) != 1)
+        if (clientGetLineFromUser(buffer, sizeof(buffer)) != 1)
         {
             printf("Unable to handle input.\n");
         }
@@ -195,7 +146,7 @@ void *client_receive_function(void *context)
             wrappers_free(cmd);
             cmd = NULL;
         }
-        print_prompt();
+        clientPrintPrompt();
         status = proto_read_command(sock_fd, &cmd);
         if (status != OK)
         {
