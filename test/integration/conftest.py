@@ -4,13 +4,17 @@ import pytest
 import pexpect
 from typing import Generator
 
-from test.integration.classes.server import Server
-from test.integration.classes.server import Client
+from test.integration.classes.spawnable import Server, Client
 
 
 @pytest.fixture(scope="function")
 def client():
-    print("I'm a client")
+    path = Path("bin", "client", "client.bin")
+    assert path.exists(), f"{path} does not exist!"
+
+    with Client(path, name="testclient") as _client:
+        _client.flush()
+        yield _client
     yield
 
 
@@ -19,8 +23,9 @@ def server():
     path = Path("bin", "server", "server.bin")
     assert path.exists(), f"{path} does not exist!"
 
-    with Server(path) as s:
-        yield s
+    with Server(path) as _server:
+        _server.flush()
+        yield _server
 
 
 @pytest.fixture(scope="function")
