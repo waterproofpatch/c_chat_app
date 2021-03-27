@@ -4,6 +4,6 @@
 
 #include "error_codes.h" /* proto_err_t */
 
-proto_err_t protoDisconnectFromServer(int sock_fd, char *reason);
+proto_err_t protoDisconnectFromServer(int sock_fd, const char *reason);
 
 #endif
