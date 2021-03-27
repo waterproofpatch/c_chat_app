@@ -43,3 +43,6 @@ install:
 
 clean:
 	@rm -rf $(BIN)
+	@rm -f test.log
+	@rm -rf build
+	@rm -f tags

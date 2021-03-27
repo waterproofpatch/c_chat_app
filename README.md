@@ -32,16 +32,22 @@ Start the server, then connect with one or more clients:
 
 ## Test
 
-Unit tests:
+All tests:
 
 ```bash
 make test
 ```
 
+Unit tests:
+
+```bash
+make unit
+```
+
 Integration tests:
 
 ```bash
-python -m pytest test
+source venv/bin/activate && make unit
 ```
 
 View the coverage results as HTML in build/artifacts/gcov/GcovCoverageResults.html
