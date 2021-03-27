@@ -20,11 +20,13 @@
 
 /* globals */
 
-static char *g_ptr;
+static char *      gPtr;
+static const char *gReason = "some_reason";
+static int         gSockFd = 2;
 
 void setUp()
 {
-    g_ptr = malloc(10);
+    gPtr = malloc(10);
 }
 
 void tearDown()
@@ -33,7 +35,7 @@ void tearDown()
 
 void *malloc_callback(size_t size, int num_calls)
 {
-    return g_ptr;
+    return gPtr;
 }
 
 void *memcpy_callback(void *dst, void *src, size_t n, int num_calls)
@@ -52,12 +54,9 @@ void *memset_callback(void *dst, int c, size_t n, int num_calls)
  */
 void test_protoDisconnectClient()
 {
-    wrappers_write_ExpectAndReturn(2,
-                                   g_ptr,
-                                   sizeof(command_t) + strlen("some_reason"),
-                                   sizeof(command_t) + strlen("some_reason"));
-    wrappers_malloc_StubWithCallback(malloc_callback);
-    wrappers_memset_StubWithCallback(memset_callback);
-    wrappers_memcpy_StubWithCallback(memcpy_callback);
-    TEST_ASSERT_EQUAL(OK, protoDisconnectClient(2, "some_reason"));
+
+    protoSendCommand_ExpectAndReturn(
+        gSockFd, CMD_SHARED_REQUEST_DISCONNECT, gReason, strlen(gReason), 0);
+
+    TEST_ASSERT_EQUAL(OK, protoDisconnectClient(2, gReason));
 }

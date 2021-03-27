@@ -8,7 +8,7 @@
 
 proto_err_t protoSendCommand(int            sock_fd,
                              command_type_t cmd_type,
-                             char *         payload,
+                             const char *   payload,
                              size_t         payload_length);
 
 #endif

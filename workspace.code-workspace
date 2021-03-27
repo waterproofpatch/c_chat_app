@@ -25,7 +25,8 @@
 			"clientloop.h": "c",
 			"clientconnect.h": "c",
 			"cstring": "c",
-			"serverhandleconnections.h": "c"
+			"serverhandleconnections.h": "c",
+			"protodisconnectclient.h": "c"
 		}
 	}
 }
