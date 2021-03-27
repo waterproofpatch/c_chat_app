@@ -4,11 +4,14 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "protoDisconnectClient.h"
+
 #include "error_codes.h"
 
 // mocks
 #include "mock_list.h"
 #include "mock_wrappers.h"
+#include "mock_protoSendCommand.h"
 
 // protocol
 #include "protocol.h"
@@ -43,13 +46,14 @@ void *memset_callback(void *dst, int c, size_t n, int num_calls)
  * @brief test disconnecting a client
  *
  */
-void test_proto_disconnect_client()
+void test_protoDisconnectClient()
 {
-    wrappers_write_ExpectAndReturn(2, g_ptr,
+    wrappers_write_ExpectAndReturn(2,
+                                   g_ptr,
                                    sizeof(command_t) + strlen("some_reason"),
                                    sizeof(command_t) + strlen("some_reason"));
     wrappers_malloc_StubWithCallback(malloc_callback);
     wrappers_memset_StubWithCallback(memset_callback);
     wrappers_memcpy_StubWithCallback(memcpy_callback);
-    TEST_ASSERT_EQUAL(OK, proto_disconnect_client(2, "some_reason"));
+    TEST_ASSERT_EQUAL(OK, protoDisconnectClient(2, "some_reason"));
 }

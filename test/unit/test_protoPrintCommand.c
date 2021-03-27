@@ -31,7 +31,7 @@ void test_proto_print_command()
     cmd->command_type = CMD_CANARY - 1;
     memset(cmd->payload, 0, MAX_PAYLOAD_LENGTH - 1);
     cmd->payload_length = MAX_PAYLOAD_LENGTH - 1;
-    proto_print_command(cmd);
+    protoPrintCommand(cmd);
 
     free(cmd);
 }
@@ -46,7 +46,7 @@ void test_proto_print_command_invalid_command_type()
     cmd->command_type   = CMD_CANARY + 1;
     cmd->payload_length = MAX_PAYLOAD_LENGTH - 1;
     memset(cmd->payload, 0, MAX_PAYLOAD_LENGTH - 1);
-    proto_print_command(cmd);
+    protoPrintCommand(cmd);
 
     free(cmd);
 }
