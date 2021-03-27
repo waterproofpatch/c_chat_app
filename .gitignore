@@ -5,3 +5,7 @@ tags
 venv
 *.pyc
 test.log
+cert.csr
+.gitignore
+key.pem
+cert.pem

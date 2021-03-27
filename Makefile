@@ -8,12 +8,17 @@ OUT_CLIENT=$(BIN_CLIENT)/client.bin
 CLIENT_SRC=$(SRC)/client/*.c $(SRC)/shared/*.c $(SRC)/wrappers/*.c
 SERVER_SRC=$(SRC)/server/*.c $(SRC)/shared/*.c $(SRC)/wrappers/*.c
 CFLAGS=-g2 -Wall -pthread
-LFLAGS=
+LFLAGS=-L/usr/local/opt/openssl/lib -lcrypto -Wall -lssl
 
 .PHONY: client
 .PHONY: server
 
 all: client server
+
+# Generate key and sign new certificate with it.
+certs:
+	openssl req -new -newkey rsa:4096 -nodes -keyout key.pem -out cert.csr
+	openssl x509 -req -sha256 -days 365 -in cert.csr -signkey key.pem -out cert.pem
 
 client:
 	@mkdir -p $(BIN_CLIENT)
@@ -22,7 +27,7 @@ client:
 
 server:
 	@mkdir -p $(BIN_SERVER)
-	gcc $(CFLAGS) $(INCLUDES) $(SERVER_SRC) -o $(OUT_SERVER)
+	gcc $(CFLAGS) $(LFLAGS) $(INCLUDES) $(SERVER_SRC) -o $(OUT_SERVER)
 
 .PHONY: test
 test: unit integration

@@ -104,10 +104,10 @@ void serverHandleConnections(void)
                 if (serverGetClientSocket(j) >= 0)
                 {
                     protoBroadcastMessage(serverGetClientSocket(j),
-                                            user->name,
-                                            strlen(user->name),
-                                            cmd->payload,
-                                            strlen(cmd->payload));
+                                          user->name,
+                                          strlen(user->name),
+                                          cmd->payload,
+                                          strlen(cmd->payload));
                 }
             }
         }

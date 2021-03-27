@@ -3,6 +3,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <openssl/evp.h>
+#include <openssl/ssl.h>
+#include <openssl/rsa.h>
+#include <openssl/err.h>
+#include <openssl/x509.h>
+
 #include "protoRequestClientName.h"
 #include "protoReadClientName.h"
 #include "protoDisconnectClient.h"
@@ -12,6 +18,79 @@
 #include "wrappers.h"
 
 extern server_state_t g_server_state;
+
+/* cert files */
+static char gCertFilename[] = "cert.pem";
+static char gKeyFilename[]  = "key.pem";
+
+/**
+ * @brief Initialize the openSSL library.
+ *
+ */
+static void init_openssl()
+{
+    SSL_load_error_strings();
+    OpenSSL_add_ssl_algorithms();
+}
+
+/**
+ * @brief Cleanup the openSSL library.
+ *
+ */
+static void cleanup_openssl()
+{
+    EVP_cleanup();
+}
+
+/**
+ * @brief Create openSSL context.
+ *
+ * @return SSL_CTX* new context.
+ */
+SSL_CTX *create_context()
+{
+    const SSL_METHOD *method = NULL;
+    SSL_CTX *         ctx    = NULL;
+
+    method = SSLv23_server_method();
+
+    ctx = SSL_CTX_new(method);
+    if (!ctx)
+    {
+        perror("Unable to create SSL context");
+        ERR_print_errors_fp(stderr);
+        exit(EXIT_FAILURE);
+    }
+
+    return ctx;
+}
+
+/**
+ * @brief Configure an SSL context.
+ *
+ * @param ctx to configure.
+ * @param certFilename path to the certificate PEM file.
+ * @param keyFilename path to the key PEM file.
+ */
+static void configure_context(SSL_CTX *ctx,
+                              char *   certFilename,
+                              char *   keyFilename)
+{
+    SSL_CTX_set_ecdh_auto(ctx, 1);
+
+    /* Set the key and cert */
+    if (SSL_CTX_use_certificate_file(ctx, certFilename, SSL_FILETYPE_PEM) <= 0)
+    {
+        ERR_print_errors_fp(stderr);
+        exit(EXIT_FAILURE);
+    }
+
+    if (SSL_CTX_use_PrivateKey_file(ctx, keyFilename, SSL_FILETYPE_PEM) <= 0)
+    {
+        ERR_print_errors_fp(stderr);
+        exit(EXIT_FAILURE);
+    }
+}
 
 /**
  * @brief process a new client connection to the server socket
@@ -29,6 +108,14 @@ proto_err_t serverProcessNewClient()
     int   new_sock_fd = 0;                     // new socket for the user
     char *name_out = NULL;   // allocated by proto when we read in the username
     user_t *new_user = NULL;   // created when we get the username
+
+    SSL_CTX *ctx = NULL;
+    SSL *    ssl = NULL;
+
+    init_openssl();
+    ctx = create_context();
+
+    configure_context(ctx, gCertFilename, gKeyFilename);
 
     new_sock_fd = accept(g_server_state.server_sock_fd,
                          (struct sockaddr *)&client_address,
