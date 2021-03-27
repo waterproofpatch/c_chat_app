@@ -56,7 +56,7 @@ class Spawnable:
 
     def send(self, cmd: str):
         LOGGER.info(f"sending {cmd}")
-        self.handle.sendline(cmd)
+        self.handle.send(cmd)
 
 
 class Server(Spawnable):
@@ -73,9 +73,6 @@ class Client(Spawnable):
     def __init__(self, path: Path, name: str):
         Spawnable.__init__(self, path, args=[f"{name}"])
         self.prompt = Client.PROMPT
-
-    def connect(self):
-        pass
 
     def disconnect(self):
         self.sendline("/quit")
