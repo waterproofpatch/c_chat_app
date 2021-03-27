@@ -19,7 +19,6 @@
 #include "mock_protoSendCommand.h"
 
 /* globals */
-
 static char *      gPtr;
 static const char *gReason = "some_reason";
 static int         gSockFd = 2;

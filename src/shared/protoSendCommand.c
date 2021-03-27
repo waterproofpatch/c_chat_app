@@ -1,3 +1,13 @@
+/**
+ * @file protoSendCommand.c
+ * @author waterproofpatch (waterproofpatch@gmail.com)
+ * @brief send a command.
+ * @version 0.1
+ * @date 2021-03-27
+ *
+ * @copyright Copyright (c) 2021
+ *
+ */
 #include "protoSendCommand.h"
 #include "protocol.h"
 #include "error_codes.h"
@@ -26,7 +36,7 @@ proto_err_t protoSendCommand(int            sock_fd,
     wrappers_memset(cmd, 0, sizeof(command_t) + payload_length);
     if (payload)
     {
-        wrappers_memcpy(cmd->payload, payload, payload_length);
+        wrappers_memcpy(cmd->payload, (void *)payload, payload_length);
     }
 
     // copy command attributes
