@@ -1,17 +1,21 @@
+/* test framework imports */
 #include "unity.h"
 #include "cmock.h"
 
+/* system includes for test code */
 #include <stdio.h>
 #include <string.h>
 
-#include "error_codes.h"
+/* FUT */
+#include "protoPrintCommand.h"
 
-// mocks
+/* project includes */
+#include "error_codes.h"
+#include "protocol.h"
+
+/* mocks */
 #include "mock_list.h"
 #include "mock_wrappers.h"
-
-// protocol
-#include "protocol.h"
 
 void setUp()
 {
@@ -25,7 +29,7 @@ void tearDown()
  * @brief Test printing a command
  *
  */
-void test_proto_print_command()
+void test_protoPrintCommand()
 {
     command_t *cmd    = malloc(sizeof(command_t) + MAX_PAYLOAD_LENGTH - 1);
     cmd->command_type = CMD_CANARY - 1;
@@ -40,7 +44,7 @@ void test_proto_print_command()
  * @brief Test printing a command that has an invalid command type
  *
  */
-void test_proto_print_command_invalid_command_type()
+void test_protoPrintCommand_invalidCommandType()
 {
     command_t *cmd      = malloc(sizeof(command_t) + MAX_PAYLOAD_LENGTH - 1);
     cmd->command_type   = CMD_CANARY + 1;

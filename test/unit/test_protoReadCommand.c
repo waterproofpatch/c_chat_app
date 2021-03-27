@@ -1,17 +1,21 @@
+/* test framework imports */
 #include "unity.h"
 #include "cmock.h"
 
-#include <stdlib.h>
+/* system includes for test code */
+#include <stdio.h>
 #include <string.h>
 
+/* FUT */
+#include "protoReadCommand.h"
+
+/* project includes */
 #include "error_codes.h"
-
-// mocks
-#include "mock_wrappers.h"
-#include "mock_list.h"
-
-// code code under test
 #include "protocol.h"
+
+/* mocks */
+#include "mock_list.h"
+#include "mock_wrappers.h"
 
 void setUp()
 {
@@ -162,7 +166,7 @@ void test_protoReadCommand()
  * @brief read 0 length
  *
  */
-void test_protoReadCommand_0_len()
+void test_protoReadCommand_0Len()
 {
     wrappers_read_StubWithCallback(read_callback_0_bytes);
     command_t *cmd = NULL;
@@ -175,7 +179,7 @@ void test_protoReadCommand_0_len()
  * @brief break the socket
  *
  */
-void test_protoReadCommand_broken_socket()
+void test_protoReadCommand_brokenSocket()
 {
     wrappers_read_StubWithCallback(read_callback_broken_socket);
     command_t *cmd = NULL;
@@ -188,7 +192,7 @@ void test_protoReadCommand_broken_socket()
  * @brief read less than a command
  *
  */
-void test_protoReadCommand_less_than_command()
+void test_protoReadCommand_lessThanCommand()
 {
     wrappers_read_StubWithCallback(read_callback_less_than_command);
     command_t *cmd = NULL;
@@ -201,7 +205,7 @@ void test_protoReadCommand_less_than_command()
  * @brief read more than max payload length
  *
  */
-void test_proto_read_more_than_max_payload()
+void test_protoReadCommand_more_than_max_payload()
 {
     wrappers_read_StubWithCallback(read_callback_more_than_max_payload);
     command_t *cmd = NULL;
@@ -214,7 +218,7 @@ void test_proto_read_more_than_max_payload()
  * @brief allocation for the payload fails
  *
  */
-void test_protoReadCommand_payload_alloc_fail()
+void test_protoReadCommand_payloadAllocFail()
 {
     command_t *cmd = NULL;
 
@@ -229,7 +233,7 @@ void test_protoReadCommand_payload_alloc_fail()
  * @brief read a legitimate command from a remote client
  *
  */
-void test_proto_read_too_few_payload()
+void test_protoReadCommand_tooFewPayload()
 {
     char *     ptr = malloc(sizeof(command_t) + strlen("testname"));
     command_t *cmd = NULL;

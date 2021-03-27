@@ -1,18 +1,23 @@
+/* test framework imports */
 #include "unity.h"
 #include "cmock.h"
 
+/* system includes for test code */
 #include <stdio.h>
 #include <string.h>
 
-#include "error_codes.h"
+/* FUT */
+#include "protoDisconnectFromServer.h"
 
-// mocks
+/* project includes */
+#include "error_codes.h"
+#include "protocol.h"
+
+/* mocks */
 #include "mock_list.h"
 #include "mock_wrappers.h"
 
-// protocol
-#include "protocol.h"
-
+/* globals */
 static char *g_ptr;
 
 void setUp()
@@ -43,7 +48,7 @@ void *memset_callback(void *dst, int c, size_t n, int num_calls)
  * @brief test disconnecting a client
  *
  */
-void test_proto_disconnect_from_server()
+void test_protoDisconnectFromServer()
 {
     wrappers_write_ExpectAndReturn(2,
                                    g_ptr,

@@ -1,20 +1,24 @@
+/* test framework imports */
 #include "unity.h"
 #include "cmock.h"
 
+/* system includes for test code */
 #include <stdio.h>
 #include <string.h>
 
+/* FUT */
 #include "protoDisconnectClient.h"
 
+/* project includes */
 #include "error_codes.h"
+#include "protocol.h"
 
-// mocks
+/* mocks */
 #include "mock_list.h"
 #include "mock_wrappers.h"
 #include "mock_protoSendCommand.h"
 
-// protocol
-#include "protocol.h"
+/* globals */
 
 static char *g_ptr;
 

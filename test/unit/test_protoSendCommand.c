@@ -1,17 +1,21 @@
+/* test framework imports */
 #include "unity.h"
 #include "cmock.h"
 
+/* system includes for test code */
 #include <stdio.h>
 #include <string.h>
 
-#include "error_codes.h"
+/* FUT */
+#include "protoSendCommand.h"
 
-// mocks
+/* project includes */
+#include "error_codes.h"
+#include "protocol.h"
+
+/* mocks */
 #include "mock_list.h"
 #include "mock_wrappers.h"
-
-// protocol
-#include "protocol.h"
 
 void setUp()
 {
