@@ -18,6 +18,7 @@ all: client server
 client:
 	@mkdir -p $(BIN_CLIENT)
 	gcc $(CFLAGS) $(LFLAGS) $(INCLUDES) $(CLIENT_SRC) -o $(OUT_CLIENT)
+	# g++ $(CFLAGS) $(LFLAGS) $(INCLUDES) $(CLIENT_SRC) -o $(OUT_CLIENT)
 
 server:
 	@mkdir -p $(BIN_SERVER)
