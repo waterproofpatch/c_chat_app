@@ -9,7 +9,7 @@ extern server_state_t g_server_state;
  *
  * @param index into the global file descriptors table.
  * @return ptr to the user at index.
- * @return  NULL if not found or not init.
+ * @return NULL if not found or not init.
  */
 user_t *serverGetClientSocket(int index)
 {

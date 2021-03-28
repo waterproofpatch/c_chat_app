@@ -6,7 +6,7 @@
 extern server_state_t g_server_state;
 
 /**
- * @brief initialize the client sockets to -1, the unused value.
+ * @brief initialize the client sockets to NULL, the unused value.
  *
  */
 void serverInitClientSockets()

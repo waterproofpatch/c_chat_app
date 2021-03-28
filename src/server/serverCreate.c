@@ -21,6 +21,11 @@ proto_err_t serverCreate(unsigned short port_no)
 
     // initialize a user list to contain list of active users
     g_server_state.active_user_list = list_init(wrappers_malloc, wrappers_free);
+    if (!g_server_state.active_user_list)
+    {
+        DBG_ERROR("Failed initing user list.\n");
+        return ERR_NO_MEM;
+    }
 
     // create an 'INTERNET' STREAM socket
     sock_fd = wrappers_socket(AF_INET, SOCK_STREAM, 0);

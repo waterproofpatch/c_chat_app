@@ -21,9 +21,8 @@ extern server_state_t g_server_state;
  */
 proto_err_t serverProcessNewClient()
 {
-    proto_err_t status =
-        OK;   // if we return anything other than OK, no user is accepted
-    socklen_t client_length =
+    proto_err_t status = OK;
+    socklen_t   client_length =
         sizeof(struct sockaddr_in);            // for the client socket
     struct sockaddr_in client_address = {0};   // the remote address of the
                                                // client
@@ -47,13 +46,14 @@ proto_err_t serverProcessNewClient()
         status = ERR_NO_MEM;
         goto done;
     }
+    wrappers_memset(new_user, 0, sizeof(*new_user));
 
     new_user->client_socket_fd = new_sock_fd;
 
     if (serverConfigureSslForClient(new_user) != OK)
     {
         DBG_ERROR("Failed configuring SSL ctx for client...\n");
-        status = ERR_GENERAL;
+        status = ERR_SSL;
         goto done;
     }
     DBG_INFO("Got a new client, asking for name!\n");

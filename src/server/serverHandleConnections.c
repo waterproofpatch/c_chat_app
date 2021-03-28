@@ -85,7 +85,7 @@ void serverHandleConnections(void)
         }
         else if (cmd->command_type == CMD_CLIENT_BROADCAST_MESSAGE)
         {
-            DBG_INFO("User %s sent a message to everyone: %s\n",
+            DBG_INFO("User [%s] sent a message to everyone: %s\n",
                      user->name,
                      cmd->payload);
             // send a message to *each* client

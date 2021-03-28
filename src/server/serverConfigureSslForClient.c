@@ -110,7 +110,7 @@ proto_err_t serverConfigureSslForClient(user_t *user)
 
     SSL_set_fd(ssl, user->client_socket_fd);
 
-    DBG_INFO("Waiting for client...\n");
+    DBG_INFO("Waiting for client SSL accept...\n");
     if (SSL_accept(ssl) <= 0)
     {
         ERR_print_errors_fp(stderr);

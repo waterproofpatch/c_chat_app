@@ -30,6 +30,7 @@ proto_err_t protoSendUserList(user_t *user, list_t *user_list)
         strncpy(
             name_list->usernames[i], active_user->name, MAX_USER_NAME_LENGTH);
     }
+
     proto_err_t res = protoSendCommand(
         user,
         CMD_SERVER_USER_LIST,
