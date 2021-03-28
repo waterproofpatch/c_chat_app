@@ -20,7 +20,7 @@ proto_err_t clientHandshake(char *username)
 {
     // the server will tell us something...
     command_t cmd = {0};
-    wrappers_read(gUser->ssl, &cmd, sizeof(command_t));
+    wrappers_read(gUser, &cmd, sizeof(command_t));
     if (cmd.command_type == CMD_SERVER_REQUEST_NAME)
     {
         printf("Sending client name to server...\n");

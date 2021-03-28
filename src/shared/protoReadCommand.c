@@ -24,8 +24,7 @@ proto_err_t protoReadCommand(user_t *user, command_t **cmd_out)
 
     *cmd_out = NULL;
 
-    int bytes_wrappers_read =
-        wrappers_read(user->ssl, &cmd_hdr, sizeof(command_t));
+    int bytes_wrappers_read = wrappers_read(user, &cmd_hdr, sizeof(command_t));
     if (bytes_wrappers_read == 0)
     {
         DBG_ERROR("No more data. Remote host closed?\n");
@@ -68,7 +67,7 @@ proto_err_t protoReadCommand(user_t *user, command_t **cmd_out)
     if (cmd_hdr.payload_length > 0)
     {
         // wrappers_read payload information
-        if (wrappers_read(user->ssl,
+        if (wrappers_read(user,
                           result_command->payload,
                           cmd_hdr.payload_length) != cmd_hdr.payload_length)
         {

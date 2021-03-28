@@ -60,7 +60,7 @@ proto_err_t protoSendCommand(user_t *       user,
     cmd->payload_length = payload_length;
 
     // send the command to the remote machine
-    if (wrappers_write(user->ssl, cmd, sizeof(command_t) + payload_length) < 0)
+    if (wrappers_write(user, cmd, sizeof(command_t) + payload_length) < 0)
     {
         return ERR_NETWORK_FAILURE;
     }

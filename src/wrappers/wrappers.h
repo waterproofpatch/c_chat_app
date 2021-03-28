@@ -14,7 +14,8 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <netinet/in.h>
-#include <openssl/ssl.h>
+
+#include "user.h"
 
 void *wrappers_malloc(size_t size);
 
@@ -47,9 +48,9 @@ void *wrappers_memset(void *b, int c, size_t len);
 
 void *wrappers_memcpy(void *dst, void *src, size_t n);
 
-ssize_t wrappers_write(SSL *ssl, void *buf, size_t nbyte);
+ssize_t wrappers_write(user_t *user, void *buf, size_t nbyte);
 
-ssize_t wrappers_read(SSL *ssl, void *buf, size_t nbyte);
+ssize_t wrappers_read(user_t *user, void *buf, size_t nbyte);
 
 int wrappers_socket(int domain, int type, int protocol);
 

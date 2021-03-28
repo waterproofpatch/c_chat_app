@@ -5,6 +5,7 @@
 /* system includes for test code */
 #include <stdio.h>
 #include <string.h>
+#include <openssl/ssl.h>
 
 /* FUT */
 #include "protoSendCommand.h"
@@ -22,7 +23,7 @@ static user_t gUser;
 
 void setUp()
 {
-    gUser.ssl = 0xdeadbeef;
+    gUser.ssl = (SSL *)0xdeabeef;
 }
 void tearDown()
 {
@@ -41,7 +42,7 @@ void test_protoSendCommand()
     wrappers_memset_ExpectAndReturn(ptr, 0, sizeof(command_t) + 10, ptr);
     wrappers_memcpy_ExpectAndReturn(
         ptr->payload, &test_payload, 10, ptr->payload);
-    wrappers_write_ExpectAndReturn(&gUser.ssl, ptr, sizeof(command_t) + 10, 0);
+    wrappers_write_ExpectAndReturn(&gUser, ptr, sizeof(command_t) + 10, 0);
 
     TEST_ASSERT_TRUE(OK == protoSendCommand(&gUser, 2, test_payload, 10));
 
@@ -74,7 +75,7 @@ void test_protoSendCommand_err_network_failure()
     wrappers_memset_ExpectAndReturn(ptr, 0, sizeof(command_t) + 10, ptr);
     wrappers_memcpy_ExpectAndReturn(
         ptr->payload, &test_payload, 10, ptr->payload);
-    wrappers_write_ExpectAndReturn(&gUser.ssl, ptr, sizeof(command_t) + 10, -1);
+    wrappers_write_ExpectAndReturn(&gUser, ptr, sizeof(command_t) + 10, -1);
 
     TEST_ASSERT_TRUE(ERR_NETWORK_FAILURE ==
                      protoSendCommand(&gUser, 2, test_payload, 10));

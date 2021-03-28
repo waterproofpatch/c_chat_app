@@ -5,7 +5,6 @@
 /* system includes for test code */
 #include <stdio.h>
 #include <string.h>
-#include <openssl/ssl.h>
 
 /* FUT */
 #include "protoReadCommand.h"
@@ -23,8 +22,6 @@ user_t gUser;
 
 void setUp()
 {
-    gUser.client_socket_fd = 2;
-    gUser.ssl              = (SSL *)0xdeadbeef;
 }
 
 void tearDown()
@@ -43,39 +40,39 @@ void *memcpy_callback(void *dst, void *src, size_t n, int num_calls)
     return dst;
 }
 
-ssize_t read_callback_less_than_command(SSL *  ssl,
-                                        void * buf_out,
-                                        size_t size,
-                                        int    num_calls)
+ssize_t read_callback_less_than_command(user_t *user,
+                                        void *  buf_out,
+                                        size_t  size,
+                                        int     num_calls)
 {
     return sizeof(command_t) - 1;
 }
-ssize_t read_callback_broken_socket(SSL *  ssl,
-                                    void * buf_out,
-                                    size_t size,
-                                    int    num_calls)
+ssize_t read_callback_broken_socket(user_t *user,
+                                    void *  buf_out,
+                                    size_t  size,
+                                    int     num_calls)
 {
     return -1;
 }
 
-ssize_t read_callback_0_bytes(SSL *  ssl,
-                              void * buf_out,
-                              size_t size,
-                              int    num_calls)
+ssize_t read_callback_0_bytes(user_t *user,
+                              void *  buf_out,
+                              size_t  size,
+                              int     num_calls)
 {
     return 0;
 }
 
-ssize_t read_callback_more_than_max_payload(SSL *  ssl,
-                                            void * buf_out,
-                                            size_t size,
-                                            int    num_calls)
+ssize_t read_callback_more_than_max_payload(user_t *user,
+                                            void *  buf_out,
+                                            size_t  size,
+                                            int     num_calls)
 {
     TEST_ASSERT_NOT_NULL(buf_out);
     // first call, expecting to read a command_t header
     if (num_calls == 0)
     {
-        TEST_ASSERT_EQUAL(ssl, gUser.ssl);
+        TEST_ASSERT_EQUAL(user, &gUser);
         TEST_ASSERT_EQUAL(sizeof(command_t), size);
         command_t *ptr_command      = (command_t *)buf_out;
         ptr_command->command_type   = CMD_CLIENT_RESPONSE_NAME;
@@ -89,16 +86,16 @@ ssize_t read_callback_more_than_max_payload(SSL *  ssl,
     return 0;
 }
 
-ssize_t read_callback_second_time_too_few_bytes(SSL *  ssl,
-                                                void * buf_out,
-                                                size_t size,
-                                                int    num_calls)
+ssize_t read_callback_second_time_too_few_bytes(user_t *user,
+                                                void *  buf_out,
+                                                size_t  size,
+                                                int     num_calls)
 {
     TEST_ASSERT_NOT_NULL(buf_out);
     // first call, expecting to read a command_t header
     if (num_calls == 0)
     {
-        TEST_ASSERT_EQUAL(ssl, gUser.ssl);
+        TEST_ASSERT_EQUAL(user, &gUser);
         TEST_ASSERT_EQUAL(sizeof(command_t), size);
         command_t *ptr_command      = (command_t *)buf_out;
         ptr_command->command_type   = CMD_CLIENT_RESPONSE_NAME;
@@ -108,7 +105,7 @@ ssize_t read_callback_second_time_too_few_bytes(SSL *  ssl,
     else if (num_calls == 1)
     {
         // read too few bytes
-        TEST_ASSERT_EQUAL(ssl, gUser.ssl);
+        TEST_ASSERT_EQUAL(user, &gUser);
         TEST_ASSERT_EQUAL(strlen("testname"), size);
         memcpy(buf_out, "testname", strlen("testname") - 1);
         return strlen("testname") - 1;
@@ -120,13 +117,13 @@ ssize_t read_callback_second_time_too_few_bytes(SSL *  ssl,
     return 1;
 }
 
-ssize_t read_callback(SSL *ssl, void *buf_out, size_t size, int num_calls)
+ssize_t read_callback(user_t *user, void *buf_out, size_t size, int num_calls)
 {
     TEST_ASSERT_NOT_NULL(buf_out);
     // first call, expecting to read a command_t header
     if (num_calls == 0)
     {
-        TEST_ASSERT_EQUAL(ssl, gUser.ssl);
+        TEST_ASSERT_EQUAL(user, &gUser);
         TEST_ASSERT_EQUAL(sizeof(command_t), size);
         command_t *ptr_command      = (command_t *)buf_out;
         ptr_command->command_type   = CMD_CLIENT_RESPONSE_NAME;
@@ -136,7 +133,7 @@ ssize_t read_callback(SSL *ssl, void *buf_out, size_t size, int num_calls)
     else if (num_calls == 1)
     {
         // reading the payload
-        TEST_ASSERT_EQUAL(ssl, gUser.ssl);
+        TEST_ASSERT_EQUAL(user, &gUser);
         TEST_ASSERT_EQUAL(strlen("testname"), size);
         memcpy(buf_out, "testname", strlen("testname"));
         return strlen("testname");
@@ -158,10 +155,10 @@ void test_protoReadCommand()
     command_t *cmd = NULL;
 
     wrappers_read_StubWithCallback(read_callback);
-    wrappers_malloc_ExpectAndReturn(strlen("testname") + sizeof(command_t),
+    wrappers_malloc_ExpectAndReturn(strlen("testname") + 1 + sizeof(command_t),
                                     ptr);
     wrappers_memset_ExpectAndReturn(
-        ptr, 0, sizeof(command_t) + strlen("testname"), ptr);
+        ptr, 0, sizeof(command_t) + strlen("testname") + 1, ptr);
     wrappers_memcpy_StubWithCallback(memcpy_callback);
 
     TEST_ASSERT_EQUAL(OK, protoReadCommand(&gUser, &cmd));
@@ -233,7 +230,8 @@ void test_protoReadCommand_payloadAllocFail()
     command_t *cmd = NULL;
 
     wrappers_read_StubWithCallback(read_callback);
-    wrappers_malloc_ExpectAndReturn(strlen("testname") + sizeof(command_t), 0);
+    wrappers_malloc_ExpectAndReturn(strlen("testname") + 1 + sizeof(command_t),
+                                    0);
 
     TEST_ASSERT_EQUAL(ERR_NO_MEM, protoReadCommand(&gUser, &cmd));
     TEST_ASSERT_NULL(cmd);
@@ -249,10 +247,10 @@ void test_protoReadCommand_tooFewPayload()
     command_t *cmd = NULL;
 
     wrappers_read_StubWithCallback(read_callback_second_time_too_few_bytes);
-    wrappers_malloc_ExpectAndReturn(strlen("testname") + sizeof(command_t),
+    wrappers_malloc_ExpectAndReturn(strlen("testname") + 1 + sizeof(command_t),
                                     ptr);
     wrappers_memset_ExpectAndReturn(
-        ptr, 0, sizeof(command_t) + strlen("testname"), ptr);
+        ptr, 0, sizeof(command_t) + strlen("testname") + 1, ptr);
     wrappers_memcpy_StubWithCallback(memcpy_callback);
     wrappers_free_Expect(ptr);
 

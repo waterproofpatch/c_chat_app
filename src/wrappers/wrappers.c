@@ -6,6 +6,7 @@
 #include <openssl/ssl.h>
 
 #include "wrappers.h"
+#include "user.h"
 
 void *wrappers_malloc(size_t size)
 {
@@ -62,14 +63,14 @@ void *wrappers_memcpy(void *dst, void *src, size_t n)
     return memcpy(dst, src, n);
 }
 
-ssize_t wrappers_write(SSL *ssl, void *buf, size_t nbyte)
+ssize_t wrappers_write(user_t *user, void *buf, size_t nbyte)
 {
-    return SSL_write(ssl, buf, nbyte);
+    return SSL_write(user->ssl, buf, nbyte);
 }
 
-ssize_t wrappers_read(SSL *ssl, void *buf, size_t nbyte)
+ssize_t wrappers_read(user_t *user, void *buf, size_t nbyte)
 {
-    return SSL_read(ssl, buf, nbyte);
+    return SSL_read(user->ssl, buf, nbyte);
 }
 
 int wrappers_close(int fd)
