@@ -50,8 +50,11 @@ proto_err_t protoReadCommand(user_t *user, command_t **cmd_out)
     }
     // now we know the size of the full resulting command, copy in header and
     // wrappers_read payload
+    DBG_INFO("allocating result_command for payload size %u\n",
+             cmd_hdr.payload_length);
+    /* +1 for null terminator */
     result_command =
-        wrappers_malloc(sizeof(command_t) + cmd_hdr.payload_length);
+        wrappers_malloc(sizeof(command_t) + cmd_hdr.payload_length + 1);
     if (!result_command)
     {
         DBG_ERROR("Unable to allocate command!\n");
@@ -59,7 +62,7 @@ proto_err_t protoReadCommand(user_t *user, command_t **cmd_out)
     }
 
     wrappers_memset(
-        result_command, 0, sizeof(command_t) + cmd_hdr.payload_length);
+        result_command, 0, sizeof(command_t) + cmd_hdr.payload_length + 1);
     // copy in the command header information
     wrappers_memcpy(result_command, &cmd_hdr, sizeof(command_t));
     if (cmd_hdr.payload_length > 0)
