@@ -5,14 +5,15 @@
 #include "error_codes.h" /* proto_err_t */
 #include "protocol.h"    /* CMD */
 #include "wrappers.h"
+#include "user.h"
 
-proto_err_t protoReadClientName(int sock_fd, char **name_out)
+proto_err_t protoReadClientName(user_t *user, char **name_out)
 {
     proto_err_t status   = OK;
     command_t * cmd_name = NULL;
     *name_out            = NULL;
 
-    status = protoReadCommand(sock_fd, &cmd_name);
+    status = protoReadCommand(user, &cmd_name);
     if (status != OK)
     {
         printf("Unable to wrappers_read client name.\n");

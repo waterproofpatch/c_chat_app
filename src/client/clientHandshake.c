@@ -10,19 +10,21 @@
 #include "error_codes.h" /* proto_err_t */
 #include "protocol.h"    /* command_t */
 #include "protoSendClientName.h"
+#include "wrappers.h"
+#include "user.h"
 
-extern int       g_sock_fd;   // socket descriptor for the client connection
+extern user_t *  gUser;
 extern pthread_t g_receive_thread;   // thread to handle receiving data
 
 proto_err_t clientHandshake(char *username)
 {
     // the server will tell us something...
     command_t cmd = {0};
-    read(g_sock_fd, &cmd, sizeof(command_t));
+    wrappers_read(gUser->ssl, &cmd, sizeof(command_t));
     if (cmd.command_type == CMD_SERVER_REQUEST_NAME)
     {
         printf("Sending client name to server...\n");
-        protoSendClientName(g_sock_fd, username, strlen(username));
+        protoSendClientName(gUser, username, strlen(username));
     }
     else
     {
@@ -31,6 +33,6 @@ proto_err_t clientHandshake(char *username)
     }
 
     // kick off receive thread to handle receipt of data
-    pthread_create(&g_receive_thread, NULL, clientReceiveFunction, &g_sock_fd);
+    pthread_create(&g_receive_thread, NULL, clientReceiveFunction, gUser);
     return OK;
 }

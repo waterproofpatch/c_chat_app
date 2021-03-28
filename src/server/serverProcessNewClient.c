@@ -3,94 +3,16 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <openssl/evp.h>
-#include <openssl/ssl.h>
-#include <openssl/rsa.h>
-#include <openssl/err.h>
-#include <openssl/x509.h>
-
 #include "protoRequestClientName.h"
 #include "protoReadClientName.h"
 #include "protoDisconnectClient.h"
 #include "serverProcessNewClient.h"
+#include "serverConfigureSslForClient.h"
 #include "serverAddUser.h"
 #include "server.h"
 #include "wrappers.h"
 
 extern server_state_t g_server_state;
-
-/* cert files */
-static char gCertFilename[] = "cert.pem";
-static char gKeyFilename[]  = "key.pem";
-
-/**
- * @brief Initialize the openSSL library.
- *
- */
-static void init_openssl()
-{
-    SSL_load_error_strings();
-    OpenSSL_add_ssl_algorithms();
-}
-
-/**
- * @brief Cleanup the openSSL library.
- *
- */
-static void cleanup_openssl()
-{
-    EVP_cleanup();
-}
-
-/**
- * @brief Create openSSL context.
- *
- * @return SSL_CTX* new context.
- */
-SSL_CTX *create_context()
-{
-    const SSL_METHOD *method = NULL;
-    SSL_CTX *         ctx    = NULL;
-
-    method = SSLv23_server_method();
-
-    ctx = SSL_CTX_new(method);
-    if (!ctx)
-    {
-        perror("Unable to create SSL context");
-        ERR_print_errors_fp(stderr);
-        exit(EXIT_FAILURE);
-    }
-
-    return ctx;
-}
-
-/**
- * @brief Configure an SSL context.
- *
- * @param ctx to configure.
- * @param certFilename path to the certificate PEM file.
- * @param keyFilename path to the key PEM file.
- */
-static void configure_context(SSL_CTX *ctx,
-                              char *   certFilename,
-                              char *   keyFilename)
-{
-    SSL_CTX_set_ecdh_auto(ctx, 1);
-
-    /* Set the key and cert */
-    if (SSL_CTX_use_certificate_file(ctx, certFilename, SSL_FILETYPE_PEM) <= 0)
-    {
-        ERR_print_errors_fp(stderr);
-        exit(EXIT_FAILURE);
-    }
-
-    if (SSL_CTX_use_PrivateKey_file(ctx, keyFilename, SSL_FILETYPE_PEM) <= 0)
-    {
-        ERR_print_errors_fp(stderr);
-        exit(EXIT_FAILURE);
-    }
-}
 
 /**
  * @brief process a new client connection to the server socket
@@ -109,14 +31,6 @@ proto_err_t serverProcessNewClient()
     char *name_out = NULL;   // allocated by proto when we read in the username
     user_t *new_user = NULL;   // created when we get the username
 
-    SSL_CTX *ctx = NULL;
-    SSL *    ssl = NULL;
-
-    init_openssl();
-    ctx = create_context();
-
-    configure_context(ctx, gCertFilename, gKeyFilename);
-
     new_sock_fd = accept(g_server_state.server_sock_fd,
                          (struct sockaddr *)&client_address,
                          &client_length);
@@ -125,10 +39,27 @@ proto_err_t serverProcessNewClient()
         DBG_ERROR("ERROR on accept\n");
         return ERR_NETWORK_FAILURE;
     }
+
+    new_user = wrappers_malloc(sizeof(user_t));
+    if (!new_user)
+    {
+        DBG_ERROR("Unable to allocate a user\n");
+        status = ERR_NO_MEM;
+        goto done;
+    }
+
+    new_user->client_socket_fd = new_sock_fd;
+
+    if (serverConfigureSslForClient(new_user) != OK)
+    {
+        DBG_ERROR("Failed configuring SSL ctx for client...\n");
+        status = ERR_GENERAL;
+        goto done;
+    }
     DBG_INFO("Got a new client, asking for name!\n");
 
     // ask the client for their name
-    status = protoRequestClientName(new_sock_fd);
+    status = protoRequestClientName(new_user);
     if (status != OK)
     {
         DBG_ERROR("Unable to request client name: %s\n",
@@ -138,12 +69,12 @@ proto_err_t serverProcessNewClient()
     }
 
     // get the name from the client
-    status = protoReadClientName(new_sock_fd, &name_out);
+    status = protoReadClientName(new_user, &name_out);
     if (status != OK)
     {
         DBG_ERROR("Unable to read client name: %s\n",
                   PROTO_ERR_T_STRING[status]);
-        status = protoDisconnectClient(new_sock_fd, "invalid client name");
+        status = protoDisconnectClient(new_user, "invalid client name");
         if (status != OK)
         {
             DBG_ERROR("Unable to disconnect client: %s\n",
@@ -154,14 +85,6 @@ proto_err_t serverProcessNewClient()
         goto done;
     }
 
-    new_user = wrappers_malloc(sizeof(user_t));
-    if (!new_user)
-    {
-        DBG_ERROR("Unable to allocate a user\n");
-        status = ERR_NO_MEM;
-        goto done;
-    }
-    new_user->client_socket_fd = new_sock_fd;
     memset(new_user->name, '\0', MAX_USER_NAME_LENGTH);
     memcpy(new_user->name, name_out, strlen(name_out));
 
@@ -171,7 +94,7 @@ proto_err_t serverProcessNewClient()
     if (existing_user)
     {
         DBG_INFO("User with name %s already exists, kicking\n", new_user->name);
-        status = protoDisconnectClient(new_sock_fd, "username already exists");
+        status = protoDisconnectClient(new_user, "username already exists");
         if (status != OK)
         {
             DBG_ERROR("Unable to kick user: %s\n", PROTO_ERR_T_STRING[status]);

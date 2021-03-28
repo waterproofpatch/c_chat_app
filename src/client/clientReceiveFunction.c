@@ -7,14 +7,15 @@
 #include "protocol.h"
 #include "error_codes.h"
 #include "wrappers.h"
+#include "user.h"
 
 extern volatile int g_is_alive;
 
 void *clientReceiveFunction(void *context)
 {
-    int         sock_fd = *(int *)context;
-    proto_err_t status  = OK;
-    command_t * cmd     = NULL;
+    user_t *    user   = (user_t *)context;
+    proto_err_t status = OK;
+    command_t * cmd    = NULL;
     printf("Receive thread started...\n");
     while (g_is_alive)
     {
@@ -25,7 +26,7 @@ void *clientReceiveFunction(void *context)
             cmd = NULL;
         }
         clientPrintPrompt();
-        status = protoReadCommand(sock_fd, &cmd);
+        status = protoReadCommand(user, &cmd);
         if (status != OK)
         {
             printf("Failed reading a command: %s\n",

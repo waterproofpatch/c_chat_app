@@ -12,6 +12,7 @@
 #include "protocol.h"
 #include "error_codes.h"
 #include "wrappers.h"
+#include "user.h"
 
 /**
  * @brief handle sending a command
@@ -21,7 +22,7 @@
  * @param payload_length: the length of the payload, if any (0 for NULL
  * payloads)
  */
-proto_err_t protoSendCommand(int            sock_fd,
+proto_err_t protoSendCommand(user_t *       user,
                              command_type_t cmd_type,
                              const char *   payload,
                              size_t         payload_length)
@@ -44,7 +45,7 @@ proto_err_t protoSendCommand(int            sock_fd,
     cmd->payload_length = payload_length;
 
     // send the command to the remote machine
-    if (wrappers_write(sock_fd, cmd, sizeof(command_t) + payload_length) < 0)
+    if (wrappers_write(user->ssl, cmd, sizeof(command_t) + payload_length) < 0)
     {
         return ERR_NETWORK_FAILURE;
     }

@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <netinet/in.h>
+#include <openssl/ssl.h>
+
 #include "wrappers.h"
 
 void *wrappers_malloc(size_t size)
@@ -60,14 +62,14 @@ void *wrappers_memcpy(void *dst, void *src, size_t n)
     return memcpy(dst, src, n);
 }
 
-ssize_t wrappers_write(int filedes, void *buf, size_t nbyte)
+ssize_t wrappers_write(SSL *ssl, void *buf, size_t nbyte)
 {
-    return write(filedes, buf, nbyte);
+    return SSL_write(ssl, buf, nbyte);
 }
 
-ssize_t wrappers_read(int filedes, void *buf, size_t nbyte)
+ssize_t wrappers_read(SSL *ssl, void *buf, size_t nbyte)
 {
-    return read(filedes, buf, nbyte);
+    return SSL_read(ssl, buf, nbyte);
 }
 
 int wrappers_close(int fd)
@@ -79,10 +81,10 @@ int wrappers_socket(int domain, int type, int protocol)
 {
     return socket(domain, type, protocol);
 }
-int wrappers_select(int     ndfs,
-                    fd_set *restrict readfds,
-                    fd_set *restrict writefds,
-                    fd_set *restrict errorfds,
+int wrappers_select(int                      ndfs,
+                    fd_set *restrict         readfds,
+                    fd_set *restrict         writefds,
+                    fd_set *restrict         errorfds,
                     struct timeval *restrict timeout)
 {
     return select(ndfs, readfds, writefds, errorfds, timeout);

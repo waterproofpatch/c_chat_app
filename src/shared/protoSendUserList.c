@@ -9,7 +9,7 @@
 #include "user.h"
 #include "list.h"
 
-proto_err_t protoSendUserList(int sock_fd, list_t *user_list)
+proto_err_t protoSendUserList(user_t *user, list_t *user_list)
 {
     // TODO protect user list with semaphore, always (delegate through accessor)
     int          num_users = list_count(user_list);
@@ -31,7 +31,7 @@ proto_err_t protoSendUserList(int sock_fd, list_t *user_list)
             name_list->usernames[i], active_user->name, MAX_USER_NAME_LENGTH);
     }
     proto_err_t res = protoSendCommand(
-        sock_fd,
+        user,
         CMD_SERVER_USER_LIST,
         (char *)name_list,
         sizeof(name_list_t) + (num_users * MAX_USER_NAME_LENGTH));

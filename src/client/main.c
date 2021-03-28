@@ -31,6 +31,7 @@ int main(int argc, char **argv)
     if (OK != res)
     {
         printf("Unable to connect: %s\n", PROTO_ERR_T_STRING[res]);
+        return res;
     }
 
     // send name to server
@@ -38,12 +39,14 @@ int main(int argc, char **argv)
     if (OK != res)
     {
         printf("Unable to complete handshake: %s\n", PROTO_ERR_T_STRING[res]);
+        return res;
     }
 
     res = clientLoop();
     if (OK != res)
     {
         printf("Unable to continue maun loop: %s\n", PROTO_ERR_T_STRING[res]);
+        return res;
     }
 
     return 0;

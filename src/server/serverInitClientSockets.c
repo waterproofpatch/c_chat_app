@@ -14,6 +14,6 @@ void serverInitClientSockets()
     int i;
     for (i = 0; i < MAX_CLIENTS; i++)
     {
-        g_server_state.client_sockets[i] = -1;
+        g_server_state.client_sockets[i] = NULL;
     }
 }

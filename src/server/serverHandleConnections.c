@@ -56,30 +56,20 @@ void serverHandleConnections(void)
     // otherwise we have a message from an already connected client
     for (int i = 0; i < MAX_CLIENTS; i++)
     {
-        int sd = serverGetClientSocket(i);
+        user_t *user = serverGetClientSocket(i);
         // if we don't have any stored fds or if the stored fd isn't the one
         // who woke us up, continue
-        if (sd == -1 || !FD_ISSET(sd, &g_server_state.all_fds))
+        if (user == NULL ||
+            !FD_ISSET(user->client_socket_fd, &g_server_state.all_fds))
         {
             continue;
         }
 
-        user_t *user = list_search(g_server_state.active_user_list,
-                                   serverClientSocketFdComparator,
-                                   &sd);
-        if (!user)
-        {
-            DBG_INFO(
-                "Someone is talking on socket %d, but I don't know "
-                "who...\n",
-                sd);
-            continue;   // this is a problem
-        }
         DBG_INFO("User [%s] has a message for the server.\n", user->name);
 
         command_t * cmd    = NULL;
         proto_err_t status = OK;
-        status             = protoReadCommand(sd, &cmd);
+        status             = protoReadCommand(user, &cmd);
         if (status != OK || cmd->command_type == CMD_SHARED_REQUEST_DISCONNECT)
         {
             DBG_INFO("Status is %s, disconnecting client %s\n",
@@ -91,7 +81,7 @@ void serverHandleConnections(void)
         {
             DBG_INFO("User [%s] requests user list from server...\n",
                      user->name);
-            protoSendUserList(sd, g_server_state.active_user_list);
+            protoSendUserList(user, g_server_state.active_user_list);
         }
         else if (cmd->command_type == CMD_CLIENT_BROADCAST_MESSAGE)
         {
@@ -101,7 +91,7 @@ void serverHandleConnections(void)
             // send a message to *each* client
             for (int j = 0; j < MAX_CLIENTS; j++)
             {
-                if (serverGetClientSocket(j) >= 0)
+                if (serverGetClientSocket(j) != NULL)
                 {
                     protoBroadcastMessage(serverGetClientSocket(j),
                                           user->name,

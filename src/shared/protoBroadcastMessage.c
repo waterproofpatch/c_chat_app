@@ -6,12 +6,13 @@
 #include "protocol.h"
 #include "wrappers.h"
 #include "error_codes.h"
+#include "user.h"
 
-proto_err_t protoBroadcastMessage(int    sock_fd,
-                                  char * name,
-                                  size_t name_length,
-                                  char * message,
-                                  size_t message_length)
+proto_err_t protoBroadcastMessage(user_t *user,
+                                  char *  name,
+                                  size_t  name_length,
+                                  char *  message,
+                                  size_t  message_length)
 {
     if (message_length > MAX_MESSAGE_LENGTH)
     {
@@ -32,7 +33,7 @@ proto_err_t protoBroadcastMessage(int    sock_fd,
     wrappers_memcpy(broadcast_message->message, message, message_length);
     broadcast_message->message_length = message_length;
     proto_err_t res =
-        protoSendCommand(sock_fd,
+        protoSendCommand(user,
                          CMD_SERVER_BROADCAST_MESSAGE,
                          (char *)broadcast_message,
                          sizeof(broadcast_message_t) + message_length + 1);

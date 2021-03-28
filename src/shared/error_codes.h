@@ -6,6 +6,7 @@
 // supplied 'RENDER' macro function.
 #define FOREACH_PROTOCOL_ERR(RENDER) \
     RENDER(OK)                       \
+    RENDER(ERR_SSL)                  \
     RENDER(ERR_NO_MEM)               \
     RENDER(ERR_INVALID_COMMAND)      \
     RENDER(ERR_PAYLOAD_TOO_LARGE)    \

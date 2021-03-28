@@ -5,8 +5,9 @@
 
 #include "error_codes.h" /* proto_err_t */
 #include "protocol.h"    /* command_type_t */
+#include "user.h"
 
-proto_err_t protoSendCommand(int            sock_fd,
+proto_err_t protoSendCommand(user_t *       user,
                              command_type_t cmd_type,
                              const char *   payload,
                              size_t         payload_length);

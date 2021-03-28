@@ -16,14 +16,16 @@ void serverRemoveUser(user_t *user)
 {
     for (int i = 0; i < MAX_CLIENTS; i++)
     {
-        if (g_server_state.client_sockets[i] == user->client_socket_fd)
+        if (g_server_state.client_sockets[i] == user)
         {
-            g_server_state.client_sockets[i] = -1;
+            wrappers_close(user->client_socket_fd);
+            list_remove(g_server_state.active_user_list, user);
+            wrappers_free(user);
+
+            g_server_state.client_sockets[i]->client_socket_fd = -1;
+            g_server_state.connected_clients--;
+
             break;
         }
     }
-    wrappers_close(user->client_socket_fd);
-    g_server_state.connected_clients--;
-    list_remove(g_server_state.active_user_list, user);
-    wrappers_free(user);
 }

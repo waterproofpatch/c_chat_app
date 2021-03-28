@@ -5,8 +5,9 @@
 #include "protocol.h"
 #include "error_codes.h"
 #include "wrappers.h"
+#include "user.h"
 
-proto_err_t protoReadCommand(int sock_fd, command_t **cmd_out)
+proto_err_t protoReadCommand(user_t *user, command_t **cmd_out)
 {
     // command struct to use when figuring out payload length
     command_t cmd_hdr = {0};
@@ -17,7 +18,7 @@ proto_err_t protoReadCommand(int sock_fd, command_t **cmd_out)
     *cmd_out = NULL;
 
     int bytes_wrappers_read =
-        wrappers_read(sock_fd, &cmd_hdr, sizeof(command_t));
+        wrappers_read(user->ssl, &cmd_hdr, sizeof(command_t));
     if (bytes_wrappers_read == 0)
     {
         printf("No more data. Remote host closed?\n");
@@ -57,7 +58,7 @@ proto_err_t protoReadCommand(int sock_fd, command_t **cmd_out)
     if (cmd_hdr.payload_length > 0)
     {
         // wrappers_read payload information
-        if (wrappers_read(sock_fd,
+        if (wrappers_read(user->ssl,
                           result_command->payload,
                           cmd_hdr.payload_length) != cmd_hdr.payload_length)
         {

@@ -4,7 +4,8 @@
 
 #include "list.h"
 #include "error_codes.h"
+#include "user.h"
 
-proto_err_t protoSendUserList(int sock_fd, list_t *user_list);
+proto_err_t protoSendUserList(user_t *user, list_t *user_list);
 
 #endif

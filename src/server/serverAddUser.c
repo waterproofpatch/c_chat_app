@@ -16,9 +16,9 @@ void serverAddUser(user_t *user)
     int i;
     for (i = 0; i < MAX_CLIENTS; i++)
     {
-        if (g_server_state.client_sockets[i] == -1)
+        if (g_server_state.client_sockets[i] == NULL)
         {
-            g_server_state.client_sockets[i] = user->client_socket_fd;
+            g_server_state.client_sockets[i] = user;
             break;
         }
     }

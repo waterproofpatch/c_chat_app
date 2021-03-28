@@ -4,7 +4,8 @@
 
 #include "protocol.h"
 #include "error_codes.h"
+#include "user.h"
 
-proto_err_t protoReadCommand(int sock_fd, command_t **cmd_out);
+proto_err_t protoReadCommand(user_t *user, command_t **cmd_out);
 
 #endif

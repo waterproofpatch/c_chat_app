@@ -5,7 +5,8 @@
 #include <stdio.h>
 
 #include "error_codes.h" /* proto_err_t */
+#include "user.h"
 
-proto_err_t protoSendClientName(int sock_fd, char *name, size_t name_length);
+proto_err_t protoSendClientName(user_t *user, char *name, size_t name_length);
 
 #endif

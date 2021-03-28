@@ -8,9 +8,10 @@
 #include "protoSendGlobalMessage.h"
 #include "clientGetLineFromUser.h"
 #include "clientPrintCommands.h"
+#include "user.h"
 
 extern volatile int g_is_alive;
-extern int          g_sock_fd;   // socket descriptor for the client connection
+extern user_t *     gUser;
 extern pthread_t    g_receive_thread;   // thread to handle receiving data
 
 proto_err_t clientLoop()
@@ -29,8 +30,8 @@ proto_err_t clientLoop()
         {
             printf("Goodbye!\n");
             g_is_alive = 0;
-            status     = protoDisconnectFromServer(g_sock_fd,
-                                               "user initiated disconnect");
+            status =
+                protoDisconnectFromServer(gUser, "user initiated disconnect");
             if (status != OK)
             {
                 printf("Unable to disconnect from server: %s\n",
@@ -46,7 +47,7 @@ proto_err_t clientLoop()
         if (strcmp(buffer, "/getusers") == 0)
         {
             printf("Requesting user list from server\n");
-            status = protoRequestUserListFromServer(g_sock_fd);
+            status = protoRequestUserListFromServer(gUser);
             if (status != OK)
             {
                 printf("Unable to get userlist from server: %s\n",
@@ -55,7 +56,7 @@ proto_err_t clientLoop()
         }
         else
         {
-            status = protoSendGlobalMessage(g_sock_fd, buffer);
+            status = protoSendGlobalMessage(gUser, buffer);
             if (status != OK)
             {
                 printf("Unable to get send message to server: %s\n",
