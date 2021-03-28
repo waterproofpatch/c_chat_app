@@ -20,9 +20,10 @@ void serverRemoveUser(user_t *user)
         {
             wrappers_close(user->client_socket_fd);
             list_remove(g_server_state.active_user_list, user);
-            wrappers_free(user);
-
             g_server_state.client_sockets[i]->client_socket_fd = -1;
+
+            wrappers_free(user);
+            g_server_state.client_sockets[i] = NULL;
             g_server_state.connected_clients--;
 
             break;
