@@ -13,10 +13,6 @@
 #include "error_codes.h"
 #include "protocol.h"
 
-/* mocks */
-#include "mock_list.h"
-#include "mock_wrappers.h"
-
 void setUp()
 {
 }

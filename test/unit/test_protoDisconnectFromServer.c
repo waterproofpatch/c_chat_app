@@ -11,13 +11,14 @@
 /* project includes */
 #include "error_codes.h"
 #include "protocol.h"
+#include "user.h"
 
 /* mocks */
 #include "mock_protoSendCommand.h"
 
 /* globals */
 static const char *gReason = "some_reason";
-static int         gSockFd = 2;
+static user_t      gUser;
 
 void setUp()
 {
@@ -34,6 +35,6 @@ void tearDown()
 void test_protoDisconnectFromServer()
 {
     protoSendCommand_ExpectAndReturn(
-        gSockFd, CMD_SHARED_REQUEST_DISCONNECT, gReason, strlen(gReason), OK);
-    TEST_ASSERT_EQUAL(OK, protoDisconnectFromServer(gSockFd, gReason));
+        &gUser, CMD_SHARED_REQUEST_DISCONNECT, gReason, strlen(gReason), OK);
+    TEST_ASSERT_EQUAL(OK, protoDisconnectFromServer(&gUser, gReason));
 }
