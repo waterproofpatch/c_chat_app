@@ -16,19 +16,12 @@ class Spawnable:
 
     def __enter__(self):
         LOGGER.debug("Entered!")
-        self.handle = pexpect.spawn(str(self.path), args=self.args)
-        LOGGER.debug("Waiting for prompt...")
-        self.handle.expect(self.prompt, timeout=1)
-        LOGGER.debug(f"{self} Got prompt!")
+        self.connect()
         return self
 
     def __exit__(self, *kwargs):
         LOGGER.debug("Exited!")
-        if self.handle:
-            LOGGER.debug(f"{self} shutting down!")
-            self.handle.sendcontrol("c")
-            self.handle.close()
-            self.handle = None
+        self.disconnect()
 
     def flush(self):
         if not self.handle:
@@ -41,6 +34,26 @@ class Spawnable:
             except pexpect.TIMEOUT:
                 break
         LOGGER.debug("done flushing...")
+
+    def disconnect(self):
+        if self.handle:
+            LOGGER.debug(f"{self} shutting down!")
+            self.handle.sendcontrol("c")
+            self.handle.close()
+            self.handle = None
+
+    def connect(self):
+        self.handle = pexpect.spawn(str(self.path), args=self.args)
+        LOGGER.debug("Waiting for prompt...")
+        self.handle.expect(self.prompt, timeout=1)
+        LOGGER.debug(f"{self} Got prompt!")
+
+    def get_prompt(self):
+        self.handle.expect(self.prompt, timeout=1)
+
+    def send_message(self, message: str):
+        self.sendline(message)
+        self.get_prompt()
 
     @property
     def before(self):
@@ -73,6 +86,14 @@ class Client(Spawnable):
     def __init__(self, path: Path, name: str):
         Spawnable.__init__(self, path, args=[f"{name}"])
         self.prompt = Client.PROMPT
+        self.name = name
 
-    def disconnect(self):
-        self.sendline("/quit")
+    def disconnect(self, graceful=True):
+        if not self.handle:
+            LOGGER.warning("no handle to close! should already be disconnected!")
+            return
+
+        if graceful:
+            self.sendline("/quit")
+            return
+        super().disconnect()
