@@ -33,3 +33,24 @@ def test_connect_invalid_name(server, client_path):
     server.expect("ERR_INVALID_COMMAND")
     client.expect("Server requested that we disconnect for reason invalid client name")
     client.disconnect()
+
+
+def test_connect_two_clients(server, client_path):
+    name_1 = "test_client_1"
+    name_2 = "test_client_2"
+
+    server.flush()
+
+    client_1 = Client(client_path, name_1)
+    client_2 = Client(client_path, name_2)
+
+    client_1.connect()
+    client_2.connect()
+
+    data_so_far = server.flush()
+    for line in data_so_far:
+        if f"Added user {client_1.name}" in line:
+            user_1_found = True
+        if f"Added user {client_2.name}" in line:
+            user_2_found = True
+    assert user_1_found == user_2_found == True

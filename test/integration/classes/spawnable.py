@@ -24,16 +24,25 @@ class Spawnable:
         self.disconnect()
 
     def flush(self):
+        """
+        Read until timeout to flush input.
+
+        :return: list of strings read
+        """
         if not self.handle:
             raise RuntimeError("No handle to flush!")
 
+        before = []
         while True:
             LOGGER.debug(f"{self}flushing...")
             try:
                 self.handle.expect(self.prompt, timeout=1)
+                before.extend(self.handle.before.decode().splitlines())
             except pexpect.TIMEOUT:
+                LOGGER.info("Got timeout, done flushing...")
                 break
-        LOGGER.debug("done flushing...")
+
+        return before
 
     def disconnect(self):
         if self.handle:
