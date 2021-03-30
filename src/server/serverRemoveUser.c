@@ -4,6 +4,7 @@
 #include "wrappers.h"
 #include "list.h"
 #include "server.h"
+#include "constants.h"
 
 extern server_state_t g_server_state;
 

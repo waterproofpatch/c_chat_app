@@ -1,7 +1,8 @@
 
 #include "serverInitClientSockets.h"
-#include "protocol.h"
+#include "types.h"
 #include "server.h"
+#include "constants.h"
 
 extern server_state_t g_server_state;
 

@@ -10,7 +10,7 @@
  */
 #ifndef _CLIENT_H
 #define _CLIENT_H
-#include "protocol.h"
+#include "types.h"
 
 /**
  * @brief loop through client to handle commands

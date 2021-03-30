@@ -10,7 +10,7 @@
 
 /* project includes */
 #include "errorCodes.h"
-#include "protocol.h"
+#include "types.h"
 #include "user.h"
 
 /* mocks */

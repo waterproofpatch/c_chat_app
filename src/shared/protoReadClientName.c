@@ -3,7 +3,7 @@
 #include "protoReadClientName.h"
 #include "protoReadCommand.h"
 #include "errorCodes.h" /* proto_err_t */
-#include "protocol.h"   /* CMD */
+#include "types.h"      /* CMD */
 #include "wrappers.h"
 #include "user.h"
 

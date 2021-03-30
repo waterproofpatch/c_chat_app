@@ -4,7 +4,7 @@
 #include <stdio.h> /* size_t */
 
 #include "errorCodes.h" /* proto_err_t */
-#include "protocol.h"   /* command_type_t */
+#include "types.h"      /* command_type_t */
 #include "user.h"
 
 proto_err_t protoSendCommand(user_t *       user,

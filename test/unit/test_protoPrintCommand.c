@@ -11,7 +11,7 @@
 
 /* project includes */
 #include "errorCodes.h"
-#include "protocol.h"
+#include "types.h"
 
 void setUp()
 {

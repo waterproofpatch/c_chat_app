@@ -3,11 +3,11 @@
 
 #include <sys/select.h>
 #include <stdio.h>
-
 #include <openssl/ssl.h>
 
-#include "protocol.h"
-
+#include "types.h"
+#include "constants.h"
+#include "errorCodes.h"
 #include "debug.h"
 
 #ifndef MAX

@@ -4,7 +4,7 @@
 #include "protoSendUserList.h"
 #include "protoSendCommand.h"
 #include "wrappers.h"
-#include "protocol.h"
+#include "types.h"
 #include "errorCodes.h"
 #include "user.h"
 #include "list.h"

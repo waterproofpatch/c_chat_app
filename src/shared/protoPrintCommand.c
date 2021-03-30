@@ -3,7 +3,7 @@
 
 #include "protoPrintCommand.h"
 #include "protoSendCommand.h"
-#include "protocol.h" /* CMD */
+#include "types.h" /* CMD */
 #include "debug.h"
 
 void protoPrintCommand(command_t *command)

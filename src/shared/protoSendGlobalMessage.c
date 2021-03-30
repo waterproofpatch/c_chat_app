@@ -3,7 +3,7 @@
 
 #include "protoSendGlobalMessage.h"
 #include "protoSendCommand.h"
-#include "protocol.h"
+#include "types.h"
 #include "errorCodes.h"
 #include "user.h"
 

@@ -9,7 +9,7 @@
  *
  */
 #include "protoSendCommand.h"
-#include "protocol.h"
+#include "types.h"
 #include "errorCodes.h"
 #include "wrappers.h"
 #include "user.h"

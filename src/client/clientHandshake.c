@@ -8,7 +8,7 @@
 #include "clientReceiveFunction.h"
 #include "protoSendClientName.h"
 #include "errorCodes.h" /* proto_err_t */
-#include "protocol.h"   /* command_t */
+#include "types.h"      /* command_t */
 #include "protoSendClientName.h"
 #include "wrappers.h"
 #include "user.h"

@@ -1,7 +1,7 @@
 
 #include "serverAddUser.h"
 #include "user.h"
-#include "protocol.h"
+#include "types.h"
 #include "server.h"
 
 extern server_state_t g_server_state;

@@ -2,7 +2,7 @@
 #ifndef _PROTO_READ_COMMAND_H_
 #define _PROTO_READ_COMMAND_H_
 
-#include "protocol.h"
+#include "types.h"
 #include "errorCodes.h"
 #include "user.h"
 

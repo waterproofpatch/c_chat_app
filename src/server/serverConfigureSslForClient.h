@@ -5,7 +5,7 @@
 #include <openssl/ssl.h>
 
 #include "user.h"
-#include "protocol.h"
+#include "errorCodes.h"
 
 proto_err_t serverConfigureSslForClient(user_t *user);
 

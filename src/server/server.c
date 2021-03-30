@@ -11,7 +11,7 @@
 #include "user.h"
 #include "errorCodes.h"
 #include "list.h"
-#include "protocol.h"
+#include "types.h"
 #include "server.h"
 #include "wrappers.h"
 
