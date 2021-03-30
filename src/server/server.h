@@ -2,7 +2,6 @@
 #define __SERVER_H_
 
 #include <sys/select.h>
-#include <stdio.h>
 #include <openssl/ssl.h>
 
 #include "list.h"

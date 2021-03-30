@@ -8,7 +8,6 @@
  * @copyright Copyright (c) 2018
  *
  */
-#include <stdio.h>
 #include <string.h>
 #include <netdb.h>
 #include <err.h>

@@ -2,8 +2,6 @@
 #ifndef _PROTO_SEND_CLIENT_NAME_H_
 #define _PROTO_SEND_CLIENT_NAME_H_
 
-#include <stdio.h>
-
 #include "errorCodes.h" /* proto_err_t */
 #include "user.h"
 

@@ -1,5 +1,4 @@
 
-#include <stdio.h>
 
 #include "protoReadCommand.h"
 #include "types.h"

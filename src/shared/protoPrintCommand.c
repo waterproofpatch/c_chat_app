@@ -1,5 +1,4 @@
 
-#include <stdio.h>
 
 #include "protoPrintCommand.h"
 #include "protoSendCommand.h"

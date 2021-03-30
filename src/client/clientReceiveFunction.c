@@ -1,5 +1,4 @@
 
-#include <stdio.h>
 
 #include "clientReceiveFunction.h"
 #include "clientPrintPrompt.h"

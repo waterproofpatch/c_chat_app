@@ -9,6 +9,7 @@
 #include "clientGetLineFromUser.h"
 #include "clientPrintCommands.h"
 #include "user.h"
+#include "debug.h"
 
 extern volatile int g_is_alive;
 extern user_t *     gUser;
@@ -23,35 +24,35 @@ proto_err_t clientLoop()
         proto_err_t status = OK;
         if (clientGetLineFromUser(buffer, sizeof(buffer)) != 1)
         {
-            printf("Unable to handle input.\n");
+            DBG_ERROR("Unable to handle input.\n");
         }
         // disconect from the server
         if (strcmp(buffer, "/quit") == 0)
         {
-            printf("Goodbye!\n");
+            DBG_INFO("Goodbye!\n");
             g_is_alive = 0;
             status =
                 protoDisconnectFromServer(gUser, "user initiated disconnect");
             if (status != OK)
             {
-                printf("Unable to disconnect from server: %s\n",
-                       PROTO_ERR_T_STRING[status]);
+                DBG_ERROR("Unable to disconnect from server: %s\n",
+                          PROTO_ERR_T_STRING[status]);
             }
             pthread_cancel(g_receive_thread);
-            printf("Joining receive thread...\n");
+            DBG_INFO("Joining receive thread...\n");
             pthread_join(g_receive_thread, NULL);
-            printf("Joined receive thread, terminating cmd loop\n");
+            DBG_INFO("Joined receive thread, terminating cmd loop\n");
             break;
         }
         // get a list of users connected to the server
         if (strcmp(buffer, "/getusers") == 0)
         {
-            printf("Requesting user list from server\n");
+            DBG_INFO("Requesting user list from server\n");
             status = protoRequestUserListFromServer(gUser);
             if (status != OK)
             {
-                printf("Unable to get userlist from server: %s\n",
-                       PROTO_ERR_T_STRING[status]);
+                DBG_ERROR("Unable to get userlist from server: %s\n",
+                          PROTO_ERR_T_STRING[status]);
             }
         }
         else
@@ -59,8 +60,8 @@ proto_err_t clientLoop()
             status = protoSendGlobalMessage(gUser, buffer);
             if (status != OK)
             {
-                printf("Unable to get send message to server: %s\n",
-                       PROTO_ERR_T_STRING[status]);
+                DBG_ERROR("Unable to get send message to server: %s\n",
+                          PROTO_ERR_T_STRING[status]);
             }
         }
     }
