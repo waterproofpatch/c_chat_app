@@ -1,9 +1,12 @@
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict
 import pexpect
 import re
 
 from test.integration.classes.spawnable import Spawnable
+from test.integration.classes.logger import get_logger
+
+LOGGER = get_logger(__name__)
 
 
 class Client(Spawnable):
@@ -33,7 +36,7 @@ class Client(Spawnable):
         self.sendline(message)
         return self.get_prompt().splitlines()
 
-    def get_users(self) -> List[str]:
+    def get_users(self) -> Dict[str, str]:
         """
         Issue the getusers command.
         :return: list of usernames

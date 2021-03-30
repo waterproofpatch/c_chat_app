@@ -1,5 +1,8 @@
 from pathlib import Path
 from test.integration.classes.spawnable import Spawnable
+from test.integration.classes.logger import get_logger
+
+LOGGER = get_logger(__name__)
 
 
 class Server(Spawnable):
