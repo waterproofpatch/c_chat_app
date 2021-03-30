@@ -2,7 +2,7 @@
 #define _PROTO_BROADCAST_MESSAGE_H_
 
 #include <stdio.h> /* size_t */
-#include "error_codes.h"
+#include "errorCodes.h"
 #include "user.h"
 
 proto_err_t protoBroadcastMessage(user_t *user,

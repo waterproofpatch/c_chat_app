@@ -1,6 +1,6 @@
 
-#ifndef __ERROR_CODES_H_
-#define __ERROR_CODES_H_
+#ifndef _ERROR_CODES_H_
+#define _ERROR_CODES_H_
 
 // Populate list of errors rendered according to
 // supplied 'RENDER' macro function.
@@ -28,4 +28,4 @@ typedef enum proto_err_t
 __attribute__((unused)) static const char *PROTO_ERR_T_STRING[] = {
     FOREACH_PROTOCOL_ERR(GENERATE_STRING)};
 
-#endif   // __ERROR_CODES_H_
+#endif

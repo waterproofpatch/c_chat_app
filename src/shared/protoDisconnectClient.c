@@ -2,8 +2,8 @@
 #include <string.h> /* strlen */
 #include "protoDisconnectClient.h"
 #include "protoSendCommand.h"
-#include "error_codes.h" /* proto_err_t */
-#include "protocol.h"    /* CMD */
+#include "errorCodes.h" /* proto_err_t */
+#include "protocol.h"   /* CMD */
 #include "user.h"
 
 proto_err_t protoDisconnectClient(user_t *user, const char *reason)

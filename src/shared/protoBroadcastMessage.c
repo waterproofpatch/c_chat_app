@@ -5,7 +5,7 @@
 #include "protoSendCommand.h"
 #include "protocol.h"
 #include "wrappers.h"
-#include "error_codes.h"
+#include "errorCodes.h"
 #include "user.h"
 
 proto_err_t protoBroadcastMessage(user_t *user,

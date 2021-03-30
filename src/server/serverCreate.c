@@ -7,7 +7,7 @@
 #include "server.h"
 #include "serverCreate.h"
 #include "wrappers.h"
-#include "error_codes.h"
+#include "errorCodes.h"
 #include "list.h"
 
 extern server_state_t g_server_state;

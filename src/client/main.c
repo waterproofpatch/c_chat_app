@@ -11,7 +11,7 @@
 #include "clientHandshake.h"
 #include "clientLoop.h"
 #include "clientConnect.h"
-#include "error_codes.h"
+#include "errorCodes.h"
 #include "client.h"
 
 int main(int argc, char **argv)

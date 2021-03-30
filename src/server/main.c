@@ -16,7 +16,7 @@
 #include <netinet/in.h>
 #include <pthread.h>
 
-#include "error_codes.h"
+#include "errorCodes.h"
 #include "server.h"
 #include "serverCreate.h"
 #include "serverHandleConnections.h"

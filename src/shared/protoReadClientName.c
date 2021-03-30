@@ -2,8 +2,8 @@
 
 #include "protoReadClientName.h"
 #include "protoReadCommand.h"
-#include "error_codes.h" /* proto_err_t */
-#include "protocol.h"    /* CMD */
+#include "errorCodes.h" /* proto_err_t */
+#include "protocol.h"   /* CMD */
 #include "wrappers.h"
 #include "user.h"
 

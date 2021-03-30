@@ -1,7 +1,7 @@
 
 #include "protoSendClientName.h"
 #include "protoSendCommand.h"
-#include "error_codes.h" /* proto_err_t */
+#include "errorCodes.h" /* proto_err_t */
 #include "protocol.h"
 #include "user.h"
 

@@ -7,8 +7,8 @@
 #include "clientHandshake.h"
 #include "clientReceiveFunction.h"
 #include "protoSendClientName.h"
-#include "error_codes.h" /* proto_err_t */
-#include "protocol.h"    /* command_t */
+#include "errorCodes.h" /* proto_err_t */
+#include "protocol.h"   /* command_t */
 #include "protoSendClientName.h"
 #include "wrappers.h"
 #include "user.h"

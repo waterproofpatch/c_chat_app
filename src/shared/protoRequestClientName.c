@@ -2,7 +2,7 @@
 #include "protoRequestClientName.h"
 #include "protoSendCommand.h"
 #include "protocol.h"
-#include "error_codes.h"
+#include "errorCodes.h"
 #include "user.h"
 
 proto_err_t protoRequestClientName(user_t *user)

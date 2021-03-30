@@ -5,7 +5,7 @@
 #include "clientPrintPrompt.h"
 #include "protoReadCommand.h"
 #include "protocol.h"
-#include "error_codes.h"
+#include "errorCodes.h"
 #include "wrappers.h"
 #include "user.h"
 #include "debug.h"

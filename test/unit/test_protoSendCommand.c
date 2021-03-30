@@ -11,7 +11,7 @@
 #include "protoSendCommand.h"
 
 /* project includes */
-#include "error_codes.h"
+#include "errorCodes.h"
 #include "protocol.h"
 #include "user.h"
 

@@ -3,8 +3,8 @@
 
 #include <stdio.h> /* size_t */
 
-#include "error_codes.h" /* proto_err_t */
-#include "protocol.h"    /* command_type_t */
+#include "errorCodes.h" /* proto_err_t */
+#include "protocol.h"   /* command_type_t */
 #include "user.h"
 
 proto_err_t protoSendCommand(user_t *       user,

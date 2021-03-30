@@ -9,7 +9,7 @@
 #include <sys/time.h>
 
 #include "user.h"
-#include "error_codes.h"
+#include "errorCodes.h"
 #include "list.h"
 #include "protocol.h"
 #include "server.h"

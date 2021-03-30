@@ -5,7 +5,7 @@
 
 #include "user.h"
 #include "list.h"
-#include "error_codes.h"
+#include "errorCodes.h"
 
 #define MAX_CLIENTS 10   // maximum number of clients we allow to be connected
 #define MAX_MESSAGE_LENGTH 3000   // maximum length for a message

@@ -17,7 +17,7 @@
 			"streambuf": "c",
 			"protocol.h": "c",
 			"user.h": "c",
-			"error_codes.h": "c",
+			"errorCodes.h": "c",
 			"protosendcommand.h": "c",
 			"protodisconnectfromserver.h": "c",
 			"protorequestuserlistfromserver.h": "c",

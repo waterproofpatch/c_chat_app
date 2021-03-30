@@ -5,7 +5,7 @@
 #include "protoSendCommand.h"
 #include "wrappers.h"
 #include "protocol.h"
-#include "error_codes.h"
+#include "errorCodes.h"
 #include "user.h"
 #include "list.h"
 

@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-#include "error_codes.h" /* proto_err_t */
+#include "errorCodes.h" /* proto_err_t */
 #include "user.h"
 
 proto_err_t protoSendClientName(user_t *user, char *name, size_t name_length);
