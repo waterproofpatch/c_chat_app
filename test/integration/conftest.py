@@ -4,7 +4,8 @@ import pytest
 import pexpect
 from typing import Generator
 
-from test.integration.classes.spawnable import Server, Client
+from test.integration.classes.client import Client
+from test.integration.classes.server import Server
 
 
 @pytest.fixture(scope="session")

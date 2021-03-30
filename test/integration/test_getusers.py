@@ -3,7 +3,5 @@ import pytest
 
 def test_getusers(server, client):
     res = client.get_users()
-    assert "Requesting user list from server" in "".join(res)
-    assert "1 users connected" in "".join(res)
-    assert f"Name: [{client.name}]" in "".join(res)
+    assert res and res["name"] == client.name
     server.expect(r"User \[{}\] requests user list from server...".format(client.name))

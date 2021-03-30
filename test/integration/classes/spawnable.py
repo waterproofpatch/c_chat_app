@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import List, Optional
 import pexpect
+import re
 
 from test.integration.classes.logger import get_logger
 
@@ -51,7 +52,7 @@ class Spawnable:
             self.handle.close()
             self.handle = None
 
-    def connect(self):
+    def connect(self) -> List[str]:
         self.handle = pexpect.spawn(str(self.path), args=self.args)
         LOGGER.debug("Waiting for prompt...")
         self.handle.expect(self.prompt, timeout=1)
@@ -77,40 +78,3 @@ class Spawnable:
     def send(self, cmd: str):
         LOGGER.info(f"sending {cmd}")
         self.handle.send(cmd)
-
-
-class Server(Spawnable):
-    PROMPT = r"\n"
-
-    def __init__(self, path: Path):
-        Spawnable.__init__(self, path)
-        self.prompt = Server.PROMPT
-
-
-class Client(Spawnable):
-    PROMPT = r"#>"
-
-    def __init__(self, path: Path, name: str):
-        Spawnable.__init__(self, path, args=[f"{name}"])
-        self.prompt = Client.PROMPT
-        self.name = name
-
-    def disconnect(self, graceful=True):
-        if not self.handle:
-            LOGGER.warning("no handle to close! should already be disconnected!")
-            return
-
-        if graceful:
-            self.sendline("/quit")
-            return
-        super().disconnect()
-
-    def send_message(self, message: str):
-        self.sendline(message)
-        return self.get_prompt().splitlines()
-
-    def get_users(self):
-        """
-        Issue the getusers command.
-        """
-        return self.send_message("/getusers")

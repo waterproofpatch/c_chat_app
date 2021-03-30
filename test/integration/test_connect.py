@@ -1,6 +1,6 @@
 import pytest
 
-from test.integration.classes.spawnable import Client
+from test.integration.classes.client import Client
 
 
 @pytest.mark.parametrize("message", ["test123", "who is this?", "some 123 numbers"])

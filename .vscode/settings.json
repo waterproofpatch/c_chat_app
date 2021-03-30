@@ -1,4 +1,9 @@
 {
     "python.pythonPath": "/Users/freeman/git/c_chat_app/venv/bin/python3.6",
-    "C_Cpp.default.includePath": ["src/shared", "src/client", "src/server"]
+    "C_Cpp.default.includePath": [
+        "src/shared",
+        "src/client",
+        "src/server"
+    ],
+    "python.linting.mypyEnabled": true
 }
