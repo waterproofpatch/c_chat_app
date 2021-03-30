@@ -61,7 +61,7 @@ void *clientReceiveFunction(void *context)
                 break;
             case CMD_SERVER_BROADCAST_MESSAGE:
                 broadcast_message = (broadcast_message_t *)cmd->payload;
-                DBG_INFO("%s: %s\n",
+                DBG_INFO("PUBLIC MESSAGE FROM [%s]: %s\n",
                          broadcast_message->name,
                          broadcast_message->message);
                 break;

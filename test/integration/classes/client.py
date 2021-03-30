@@ -12,6 +12,9 @@ LOGGER = get_logger(__name__)
 class Client(Spawnable):
     PROMPT = r"#>"
     USER_REGEX = re.compile(r"Name: \[(?P<name>\w+)\]")
+    MESSAGE_REGEX = re.compile(
+        r"PUBLIC MESSAGE FROM \[(?P<from>\w+)\]: (?P<message>\w.*)"
+    )
 
     def __init__(self, path: Path, name: str):
         Spawnable.__init__(self, path, args=[f"{name}"])
@@ -49,3 +52,17 @@ class Client(Spawnable):
                 users.append(match.groupdict())
 
         return users
+
+    def get_messages(self) -> List[Dict[str, str]]:
+        """
+        Reads until prompt to get new messages.
+        :return: list of dict of messages.
+        """
+        res = self.flush()
+        messages = []
+        for line in res:
+            match = re.search(Client.MESSAGE_REGEX, line)
+            if match:
+                messages.append(match.groupdict())
+
+        return messages
