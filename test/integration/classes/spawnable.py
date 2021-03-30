@@ -62,10 +62,6 @@ class Spawnable:
         self.handle.expect(self.prompt, timeout=1)
         return self.before.decode()
 
-    def send_message(self, message: str):
-        self.sendline(message)
-        return self.get_prompt().splitlines()
-
     @property
     def before(self):
         return self.handle.before
@@ -108,6 +104,10 @@ class Client(Spawnable):
             self.sendline("/quit")
             return
         super().disconnect()
+
+    def send_message(self, message: str):
+        self.sendline(message)
+        return self.get_prompt().splitlines()
 
     def get_users(self):
         """
