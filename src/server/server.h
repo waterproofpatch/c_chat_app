@@ -5,9 +5,9 @@
 #include <stdio.h>
 #include <openssl/ssl.h>
 
-#include "types.h"
+#include "list.h"
 #include "constants.h"
-#include "errorCodes.h"
+#include "user.h"
 
 /**
  * @brief encapsulate server global state
