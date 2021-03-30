@@ -99,3 +99,9 @@ class Client(Spawnable):
             self.sendline("/quit")
             return
         super().disconnect()
+
+    def get_users(self):
+        """
+        Issue the getusers command.
+        """
+        return self.send_message("/getusers")

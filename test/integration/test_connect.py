@@ -5,7 +5,7 @@ from test.integration.classes.spawnable import Client
 
 @pytest.mark.parametrize("message", ["test123", "who is this?", "some 123 numbers"])
 def test_connect(server, client, message):
-    res = client.send_message(message)
+    _ = client.send_message(message)
     server.expect(message)
 
 
