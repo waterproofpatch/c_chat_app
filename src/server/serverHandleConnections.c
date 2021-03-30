@@ -16,6 +16,7 @@
 #include "wrappers.h"
 #include "list.h"
 #include "constants.h"
+#include "debug.h"
 
 extern server_state_t g_server_state;
 

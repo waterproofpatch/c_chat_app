@@ -2,6 +2,10 @@
 #ifndef _CONSTANTS_H_
 #define _CONSTANTS_H_
 
+#ifndef MAX
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#endif
+
 #define MAX_CLIENTS 10   // maximum number of clients we allow to be connected
 #define MAX_MESSAGE_LENGTH 3000   // maximum length for a message
 #define MAX_PAYLOAD_LENGTH \

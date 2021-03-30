@@ -12,6 +12,7 @@
 #include "serverConfigureSslForClient.h"
 #include "server.h"
 #include "wrappers.h"
+#include "debug.h"
 
 /* cert files */
 static char gCertFilename[] = "cert.pem";

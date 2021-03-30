@@ -9,6 +9,7 @@
 #include "wrappers.h"
 #include "errorCodes.h"
 #include "list.h"
+#include "debug.h"
 
 extern server_state_t g_server_state;
 
