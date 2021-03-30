@@ -11,7 +11,7 @@ LOGGER = get_logger(__name__)
 
 class Client(Spawnable):
     PROMPT = r"#>"
-    USER_REGEX = re.compile(r"Name: \[(?P<name>.*)\]")
+    USER_REGEX = re.compile(r"Name: \[(?P<name>\w+)\]")
 
     def __init__(self, path: Path, name: str):
         Spawnable.__init__(self, path, args=[f"{name}"])
@@ -36,13 +36,16 @@ class Client(Spawnable):
         self.sendline(message)
         return self.get_prompt().splitlines()
 
-    def get_users(self) -> Dict[str, str]:
+    def get_users(self) -> List[Dict[str, str]]:
         """
         Issue the getusers command.
-        :return: list of usernames
+        :return: list of dict of usernames.
         """
-        res = "".join(self.send_message("/getusers"))
-        match = re.search(Client.USER_REGEX, res)
-        if not match:
-            return []
-        return match.groupdict()
+        res = self.send_message("/getusers")
+        users = []
+        for line in res:
+            match = re.search(Client.USER_REGEX, line)
+            if match:
+                users.append(match.groupdict())
+
+        return users

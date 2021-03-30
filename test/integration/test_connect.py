@@ -54,3 +54,29 @@ def test_connect_two_clients(server, client_path):
         if f"Added user {client_2.name}" in line:
             user_2_found = True
     assert user_1_found == user_2_found == True
+
+
+@pytest.mark.parametrize("graceful", [True, False])
+def test_connect_two_clients_disconnect(server, client_path, graceful):
+    name_1 = "test_client_1"
+    name_2 = "test_client_2"
+
+    _ = server.flush()
+
+    client_1 = Client(client_path, name_1)
+    client_2 = Client(client_path, name_2)
+
+    client_1.connect()
+    client_2.connect()
+
+    _ = server.flush()
+
+    client_1.disconnect(graceful=graceful)
+    server.expect(
+        f"{'REMOTE_HOST_CLOSED' if not graceful else 'Status is OK'}, disconnecting client {client_1.name}"
+    )
+
+    client_2.disconnect(graceful=graceful)
+    server.expect(
+        f"{'REMOTE_HOST_CLOSED' if not graceful else 'Status is OK'}, disconnecting client {client_2.name}"
+    )

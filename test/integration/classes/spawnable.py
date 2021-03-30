@@ -59,7 +59,7 @@ class Spawnable:
         LOGGER.debug(f"{self} Got prompt!")
         return self.before.decode().splitlines()
 
-    def get_prompt(self):
+    def get_prompt(self) -> str:
         self.handle.expect(self.prompt, timeout=1)
         return self.before.decode()
 
