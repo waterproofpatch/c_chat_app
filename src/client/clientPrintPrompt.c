@@ -8,6 +8,6 @@
  */
 void clientPrintPrompt(void)
 {
-    printf("%s", "> ");
+    printf("%s", "#> ");
     fflush(stdout);
 }

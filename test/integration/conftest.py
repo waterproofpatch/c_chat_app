@@ -7,20 +7,28 @@ from typing import Generator
 from test.integration.classes.spawnable import Server, Client
 
 
-@pytest.fixture(scope="function")
-def server():
-    path = Path("bin", "server", "server.bin")
-    assert path.exists(), f"{path} does not exist!"
+@pytest.fixture(scope="session")
+def server_path():
+    return Path("bin", "server", "server.bin")
 
-    with Server(path) as _server:
+
+@pytest.fixture(scope="session")
+def client_path():
+    return Path("bin", "client", "client.bin")
+
+
+@pytest.fixture(scope="function")
+def server(server_path):
+    assert server_path.exists(), f"{path} does not exist!"
+
+    with Server(server_path) as _server:
         _server.flush()
         yield _server
 
 
 @pytest.fixture(scope="function")
-def client():
-    path = Path("bin", "client", "client.bin")
-    assert path.exists(), f"{path} does not exist!"
+def client(client_path):
+    assert client_path.exists(), f"{path} does not exist!"
 
-    with Client(path, name="test_client") as s:
+    with Client(client_path, name="test_client") as s:
         yield s

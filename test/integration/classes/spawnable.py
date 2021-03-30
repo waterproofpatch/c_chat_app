@@ -50,10 +50,11 @@ class Spawnable:
 
     def get_prompt(self):
         self.handle.expect(self.prompt, timeout=1)
+        return self.before.decode()
 
     def send_message(self, message: str):
         self.sendline(message)
-        self.get_prompt()
+        return self.get_prompt().splitlines()
 
     @property
     def before(self):
@@ -81,7 +82,7 @@ class Server(Spawnable):
 
 
 class Client(Spawnable):
-    PROMPT = r">"
+    PROMPT = r"#>"
 
     def __init__(self, path: Path, name: str):
         Spawnable.__init__(self, path, args=[f"{name}"])

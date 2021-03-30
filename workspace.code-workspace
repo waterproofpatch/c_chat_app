@@ -28,7 +28,8 @@
 			"serverhandleconnections.h": "c",
 			"protodisconnectclient.h": "c",
 			"wrappers.h": "c",
-			"serverconfiguresslforclient.h": "c"
+			"serverconfiguresslforclient.h": "c",
+			"protoreadcommand.h": "c"
 		}
 	}
 }

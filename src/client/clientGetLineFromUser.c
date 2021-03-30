@@ -15,8 +15,7 @@ int clientGetLineFromUser(char *buff, size_t buff_length)
 {
     int ch, extra;
 
-    // get line with buffer overrun protection.
-    clientPrintPrompt();
+    /* read a command from the user */
     if (fgets(buff, buff_length, stdin) == NULL)
     {
         return -1;
