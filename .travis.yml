@@ -1,4 +1,4 @@
-os: linux
+os: bionic
 language: c
 sudo: required
 install: make install
