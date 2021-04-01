@@ -1,4 +1,4 @@
-os: ubuntu
+os: linux
 language: c
 sudo: required
 install: make install
