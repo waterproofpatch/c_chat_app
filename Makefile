@@ -42,11 +42,7 @@ integration:
 	python -m pytest -s test
 
 install:
-	sudo apt update
-	sudo apt install ruby-full	
-	sudo gem install ceedling
-	sudo pip3 install gcovr
-	pip install -r requirements.txt
+	./install-deps.sh
 
 clean:
 	@rm -rf $(BIN)
