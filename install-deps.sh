@@ -2,6 +2,11 @@
 
 # apt stuff
 sudo apt update
+which pip
+which pip3
+pip --version
+
+exit 1
 
 # ruby stuff
 curl -sSL https://get.rvm.io | bash -s stable
