@@ -10,4 +10,6 @@ rvm use 2.7 --default
 gem install ceedling
 
 # pip stuff
+which pip3
+pip3 --version
 pip3 install -r requirements.txt
