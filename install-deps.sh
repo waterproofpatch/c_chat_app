@@ -2,8 +2,13 @@
 
 # apt stuff
 sudo apt update
-sudo apt-get install python3
-sudo apt-get install python3-pip
+# sudo apt-get install python3
+# sudo apt-get install python3-pip
+python --version
+python3 --version
+pip --version
+pip3 --version
+exit 1
 
 # ruby stuff
 curl -sSL https://get.rvm.io | bash -s stable
