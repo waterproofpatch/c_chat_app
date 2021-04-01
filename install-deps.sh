@@ -2,11 +2,6 @@
 
 # apt stuff
 sudo apt update
-which pip
-which pip3
-pip --version
-
-exit 1
 
 # ruby stuff
 curl -sSL https://get.rvm.io | bash -s stable
@@ -15,5 +10,4 @@ rvm use 2.7 --default
 gem install ceedling
 
 # pip stuff
-python3 -m pip --version
-python3 -m pip3 install -r requirements.txt
+pip3 install -r requirements.txt
