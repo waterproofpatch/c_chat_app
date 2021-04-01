@@ -11,4 +11,5 @@ rvm use 2.7 --default
 gem install ceedling
 
 # pip stuff
+pip3 install --upgrade pip
 pip3 install -r requirements.txt
