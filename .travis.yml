@@ -1,5 +1,12 @@
-os: ubuntu
 language: c
+dist: bionix
+os: ubuntu
 sudo: required
-install: ./install-deps.sh
-script: make && make test
+
+python:
+  - "3.4"
+
+compiler:
+  - gcc
+
+install: "pip install --user -r requirements.txt"
