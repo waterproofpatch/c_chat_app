@@ -1,6 +1,8 @@
+language: c
 os: linux
 dist: bionic
-language: c
-sudo: required
-install: make install
-script: make && make test
+python:
+  - "3.6"
+
+install:
+  - pip install -r requirements.txt
