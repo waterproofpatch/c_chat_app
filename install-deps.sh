@@ -11,4 +11,4 @@ gem install ceedling
 
 # pip stuff
 which pip3
-python3.6 -m pip3 --version
+pip3 --version
