@@ -1,9 +1,5 @@
+os: ubuntu
 language: c
-os: linux
-dist: bionic
-python:
-  - "3.6"
-  - "pypy3"
-
-install:
-  - pip install -r requirements.txt
+sudo: required
+install: ./install-deps.sh
+script: make && make test
