@@ -11,5 +11,6 @@ gem install ceedling
 
 # pip stuff
 which pip3
+python3 -m pip --version
 pip3 --version
 pip3 install -r requirements.txt
