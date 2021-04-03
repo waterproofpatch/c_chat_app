@@ -42,7 +42,7 @@ integration:
 	python -m pytest -s test
 
 install:
-	./install-deps.sh
+	pip3 install -r requirements.txt
 
 clean:
 	@rm -rf $(BIN)
