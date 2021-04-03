@@ -1,4 +1,4 @@
-language: c
+language: python
 dist: bionix
 os: ubuntu
 sudo: required
