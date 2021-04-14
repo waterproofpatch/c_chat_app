@@ -1,5 +1,5 @@
 SRC = src
-INCLUDES=-I $(SRC)/shared -I $(SRC)/wrappers
+INCLUDES=-I $(SRC)/shared -I $(SRC)/wrappers -I $(CPPUTEST_HOME)/include
 BIN=bin
 BIN_SERVER=$(BIN)/server
 BIN_CLIENT=$(BIN)/client
@@ -26,13 +26,15 @@ client:
 
 server:
 	@mkdir -p $(BIN_SERVER)
-	gcc $(CFLAGS) $(LFLAGS) $(INCLUDES) $(SERVER_SRC) -o $(OUT_SERVER)
+	g++ $(CFLAGS) $(LFLAGS) $(INCLUDES) $(SERVER_SRC) -o $(OUT_SERVER)
 
 .PHONY: test
 test: unit integration
 
 unit:
 	echo "Coming soon"
+	g++ test/unit/*.cpp -lCppUTest -lCppUTestExt -o test/unit/testRunner.bin
+	./test/unit/testRunner.bin
 
 # run the pytests
 integration:
