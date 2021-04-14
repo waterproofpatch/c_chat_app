@@ -1,4 +1,3 @@
-bin
 .vscode/launch.json
 build
 tags
@@ -9,4 +8,6 @@ cert.csr
 .gitignore
 key.pem
 cert.pem
-test/unit/testRunner.bin
+*.bin
+bin/client/client.bin.dSYM/Contents/Info.plist
+bin/server/server.bin.dSYM/Contents/Info.plist

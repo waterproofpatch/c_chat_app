@@ -12,6 +12,9 @@ SERVER_SRC=$(SRC)/server/*.cpp $(SRC)/shared/*.cpp $(SRC)/wrappers/*.cpp
 CFLAGS=-g2 -Wall -pthread
 LFLAGS=-L/usr/local/opt/openssl/lib -lcrypto -Wall -lssl
 
+# test variables
+TEST_BIN=test/unit/allTests.bin
+
 .PHONY: client
 .PHONY: server
 
@@ -34,8 +37,8 @@ server:
 test: unit integration
 
 unit: 
-	g++ test/unit/*.cpp $(SRC)/shared/*.cpp $(SRC)/wrappers/*.cpp $(LFLAGS) -lCppUTest -lCppUTestExt -o test/unit/testRunner.bin $(INCLUDES) $(CLIENT_INCLUDES) $(SERVER_INCLUDES)
-	./test/unit/testRunner.bin
+	g++ test/unit/*.cpp $(SRC)/shared/*.cpp $(SRC)/wrappers/*.cpp $(LFLAGS) -lCppUTest -lCppUTestExt -o $(TEST_BIN) $(INCLUDES) $(CLIENT_INCLUDES) $(SERVER_INCLUDES)
+	./$(TEST_BIN)
 
 # run the pytests
 integration:
