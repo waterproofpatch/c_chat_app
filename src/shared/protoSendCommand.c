@@ -42,7 +42,8 @@ proto_err_t protoSendCommand(user_t *       user,
         return ERR_GENERAL;
     }
 
-    command_t *cmd = wrappers_malloc(sizeof(command_t) + payload_length);
+    command_t *cmd =
+        (command_t *)wrappers_malloc(sizeof(command_t) + payload_length);
     if (!cmd)
     {
         return ERR_NO_MEM;

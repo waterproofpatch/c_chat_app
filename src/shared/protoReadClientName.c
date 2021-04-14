@@ -11,6 +11,7 @@ proto_err_t protoReadClientName(user_t *user, char **name_out)
     proto_err_t status   = OK;
     command_t * cmd_name = NULL;
     *name_out            = NULL;
+    char *name           = NULL;
 
     status = protoReadCommand(user, &cmd_name);
     if (status != OK)
@@ -31,14 +32,14 @@ proto_err_t protoReadClientName(user_t *user, char **name_out)
         status = ERR_INVALID_COMMAND;
         goto done;
     }
-
-    char *name = wrappers_malloc(cmd_name->payload_length + 1);
+    name = (char *)wrappers_malloc(cmd_name->payload_length + 1);
     if (!name)
     {
         DBG_ERROR("Unable to allocate a name buffer!\n");
         status = ERR_NO_MEM;
         goto done;
     }
+
     name[cmd_name->payload_length] = '\0';   // null terminate the name
     wrappers_memcpy(name, cmd_name->payload, cmd_name->payload_length);
     *name_out = name;
@@ -49,6 +50,11 @@ done:
     {
         wrappers_free(cmd_name);
         cmd_name = NULL;
+        if (status != OK && name)
+        {
+            wrappers_free(name);
+            name = NULL;
+        }
     }
     return status;
 }

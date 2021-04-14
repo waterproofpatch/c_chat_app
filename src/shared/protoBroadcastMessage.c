@@ -19,7 +19,8 @@ proto_err_t protoBroadcastMessage(user_t *user,
         return ERR_PAYLOAD_TOO_LARGE;
     }
     broadcast_message_t *broadcast_message =
-        wrappers_malloc(sizeof(broadcast_message_t) + message_length + 1);
+        (broadcast_message_t *)wrappers_malloc(sizeof(broadcast_message_t) +
+                                               message_length + 1);
 
     if (!broadcast_message)
     {

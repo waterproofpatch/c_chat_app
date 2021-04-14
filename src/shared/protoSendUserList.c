@@ -13,7 +13,8 @@ proto_err_t protoSendUserList(user_t *user, list_t *user_list)
 {
     // TODO protect user list with semaphore, always (delegate through accessor)
     int          num_users = list_count(user_list);
-    name_list_t *name_list = wrappers_malloc(sizeof(name_list_t));
+    name_list_t *name_list =
+        (name_list_t *)wrappers_malloc(sizeof(name_list_t));
     if (!name_list)
     {
         return ERR_NO_MEM;
@@ -22,7 +23,7 @@ proto_err_t protoSendUserList(user_t *user, list_t *user_list)
 
     for (int i = 0; i < name_list->num_names; i++)
     {
-        user_t *active_user = list_get_at_index(user_list, i);
+        user_t *active_user = (user_t *)list_get_at_index(user_list, i);
         if (!active_user)
         {
             return ERR_GENERAL;

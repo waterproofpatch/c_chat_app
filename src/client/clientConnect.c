@@ -72,7 +72,7 @@ proto_err_t clientConnect(char *hostname, unsigned short port_no)
     }
 
     // create a socket to handle data
-    gUser = wrappers_malloc(sizeof(*gUser));
+    gUser = (user_t *)wrappers_malloc(sizeof(*gUser));
     if (!gUser)
     {
         DBG_ERROR("Error creating user!\n");

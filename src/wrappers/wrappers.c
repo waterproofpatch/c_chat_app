@@ -82,11 +82,12 @@ int wrappers_socket(int domain, int type, int protocol)
 {
     return socket(domain, type, protocol);
 }
-int wrappers_select(int                      ndfs,
-                    fd_set *restrict         readfds,
-                    fd_set *restrict         writefds,
-                    fd_set *restrict         errorfds,
-                    struct timeval *restrict timeout)
+
+int wrappers_select(int             ndfs,
+                    fd_set *        readfds,
+                    fd_set *        writefds,
+                    fd_set *        errorfds,
+                    struct timeval *timeout)
 {
     return select(ndfs, readfds, writefds, errorfds, timeout);
 }

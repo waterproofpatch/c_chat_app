@@ -154,6 +154,9 @@ void test_protoReadCommand()
     char *     ptr = malloc(sizeof(command_t) + strlen("testname"));
     command_t *cmd = NULL;
 
+    wrappers_memset_ExpectAndReturn(0, 0, sizeof(command_t), 0);
+    wrappers_memset_IgnoreArg_b();
+
     wrappers_read_StubWithCallback(read_callback);
     wrappers_malloc_ExpectAndReturn(strlen("testname") + 1 + sizeof(command_t),
                                     ptr);
@@ -175,8 +178,11 @@ void test_protoReadCommand()
  */
 void test_protoReadCommand_0Len()
 {
-    wrappers_read_StubWithCallback(read_callback_0_bytes);
     command_t *cmd = NULL;
+
+    wrappers_read_StubWithCallback(read_callback_0_bytes);
+    wrappers_memset_ExpectAndReturn(0, 0, sizeof(command_t), 0);
+    wrappers_memset_IgnoreArg_b();
 
     TEST_ASSERT_EQUAL(ERR_REMOTE_HOST_CLOSED, protoReadCommand(&gUser, &cmd));
     TEST_ASSERT_NULL(cmd);
@@ -188,8 +194,10 @@ void test_protoReadCommand_0Len()
  */
 void test_protoReadCommand_brokenSocket()
 {
-    wrappers_read_StubWithCallback(read_callback_broken_socket);
     command_t *cmd = NULL;
+    wrappers_read_StubWithCallback(read_callback_broken_socket);
+    wrappers_memset_ExpectAndReturn(0, 0, sizeof(command_t), 0);
+    wrappers_memset_IgnoreArg_b();
 
     TEST_ASSERT_EQUAL(ERR_NETWORK_FAILURE, protoReadCommand(&gUser, &cmd));
     TEST_ASSERT_NULL(cmd);
@@ -201,8 +209,10 @@ void test_protoReadCommand_brokenSocket()
  */
 void test_protoReadCommand_lessThanCommand()
 {
-    wrappers_read_StubWithCallback(read_callback_less_than_command);
     command_t *cmd = NULL;
+    wrappers_read_StubWithCallback(read_callback_less_than_command);
+    wrappers_memset_ExpectAndReturn(0, 0, sizeof(command_t), 0);
+    wrappers_memset_IgnoreArg_b();
 
     TEST_ASSERT_EQUAL(ERR_INVALID_COMMAND, protoReadCommand(&gUser, &cmd));
     TEST_ASSERT_NULL(cmd);
@@ -214,8 +224,10 @@ void test_protoReadCommand_lessThanCommand()
  */
 void test_protoReadCommand_more_than_max_payload()
 {
-    wrappers_read_StubWithCallback(read_callback_more_than_max_payload);
     command_t *cmd = NULL;
+    wrappers_read_StubWithCallback(read_callback_more_than_max_payload);
+    wrappers_memset_ExpectAndReturn(0, 0, sizeof(command_t), 0);
+    wrappers_memset_IgnoreArg_b();
 
     TEST_ASSERT_EQUAL(ERR_PAYLOAD_TOO_LARGE, protoReadCommand(&gUser, &cmd));
     TEST_ASSERT_NULL(cmd);
@@ -229,6 +241,8 @@ void test_protoReadCommand_payloadAllocFail()
 {
     command_t *cmd = NULL;
 
+    wrappers_memset_ExpectAndReturn(0, 0, sizeof(command_t), 0);
+    wrappers_memset_IgnoreArg_b();
     wrappers_read_StubWithCallback(read_callback);
     wrappers_malloc_ExpectAndReturn(strlen("testname") + 1 + sizeof(command_t),
                                     0);
@@ -246,6 +260,8 @@ void test_protoReadCommand_tooFewPayload()
     char *     ptr = malloc(sizeof(command_t) + strlen("testname"));
     command_t *cmd = NULL;
 
+    wrappers_memset_ExpectAndReturn(0, 0, sizeof(command_t), 0);
+    wrappers_memset_IgnoreArg_b();
     wrappers_read_StubWithCallback(read_callback_second_time_too_few_bytes);
     wrappers_malloc_ExpectAndReturn(strlen("testname") + 1 + sizeof(command_t),
                                     ptr);

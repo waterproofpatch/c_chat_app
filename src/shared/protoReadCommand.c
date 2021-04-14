@@ -10,10 +10,12 @@
 proto_err_t protoReadCommand(user_t *user, command_t **cmd_out)
 {
     // command struct to use when figuring out payload length
-    command_t cmd_hdr = {0};
+    command_t cmd_hdr;
 
     // command to return
     command_t *result_command = NULL;
+
+    wrappers_memset(&cmd_hdr, 0, sizeof(cmd_hdr));
 
     if (cmd_out == NULL)
     {
@@ -51,8 +53,8 @@ proto_err_t protoReadCommand(user_t *user, command_t **cmd_out)
     DBG_INFO("allocating result_command for payload size %u\n",
              cmd_hdr.payload_length);
     /* +1 for null terminator */
-    result_command =
-        wrappers_malloc(sizeof(command_t) + cmd_hdr.payload_length + 1);
+    result_command = (command_t *)wrappers_malloc(sizeof(command_t) +
+                                                  cmd_hdr.payload_length + 1);
     if (!result_command)
     {
         DBG_ERROR("Unable to allocate command!\n");
