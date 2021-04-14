@@ -32,10 +32,7 @@ server:
 test: unit integration
 
 unit:
-	mkdir -p test/support # required for ceedling to run
-	ceedling clobber # remove all build artifacts from last test
-	ceedling gcov:all # run test and generate coverage metrics
-	ceedling utils:gcov # convert coverage metrics to html
+	echo "Coming soon"
 
 # run the pytests
 integration:
