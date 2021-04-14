@@ -21,6 +21,7 @@
 #include "serverHandleConnections.hpp"
 #include "debug.hpp"
 
+#ifndef UNIT_TEST
 int main(int argc, char *argv[])
 {
     // we'll listen on a high port to avoid having to sudo
@@ -42,3 +43,4 @@ int main(int argc, char *argv[])
     }
     return 0;
 }
+#endif

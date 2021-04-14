@@ -13,7 +13,9 @@ CFLAGS=-g2 -Wall -pthread
 LFLAGS=-L/usr/local/opt/openssl/lib -lcrypto -Wall -lssl
 
 # test variables
-TEST_BIN=test/unit/allTests.bin
+SERVER_TEST_BIN=test/unit/server/allTests.bin
+CLIENT_TEST_BIN=test/unit/client/allTests.bin
+TEST_DEFINES=-DUNIT_TEST
 
 .PHONY: client
 .PHONY: server
@@ -37,8 +39,10 @@ server:
 test: unit integration
 
 unit: 
-	g++ test/unit/*.cpp $(SRC)/shared/*.cpp $(SRC)/wrappers/*.cpp $(LFLAGS) -lCppUTest -lCppUTestExt -o $(TEST_BIN) $(INCLUDES) $(CLIENT_INCLUDES) $(SERVER_INCLUDES)
-	./$(TEST_BIN)
+	g++ test/unit/client/*.cpp $(TEST_DEFINES) $(CLIENT_SRC) $(LFLAGS) -lCppUTest -lCppUTestExt -o $(CLIENT_TEST_BIN) $(INCLUDES) $(CLIENT_INCLUDES) 
+	g++ test/unit/server/*.cpp $(TEST_DEFINES) $(SERVER_SRC) $(LFLAGS) -lCppUTest -lCppUTestExt -o $(SERVER_TEST_BIN) $(INCLUDES) $(SERVER_INCLUDES)
+	./$(CLIENT_TEST_BIN)
+	./$(SERVER_TEST_BIN)
 
 # run the pytests
 integration:

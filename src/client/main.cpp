@@ -13,6 +13,7 @@
 #include "errorCodes.hpp"
 #include "debug.hpp"
 
+#ifndef UNIT_TEST
 int main(int argc, char **argv)
 {
     proto_err_t res = OK;
@@ -52,3 +53,4 @@ int main(int argc, char **argv)
 
     return 0;
 }
+#endif
