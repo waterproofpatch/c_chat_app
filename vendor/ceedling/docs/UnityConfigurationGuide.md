@@ -22,7 +22,6 @@ challenging to build. From a more positive perspective, it is also proof that a
 great deal of complexity can be centralized primarily to one place to
 provide a more consistent and simple experience elsewhere.
 
-
 ### Using These Options
 
 It doesn't matter if you're using a target-specific compiler and a simulator or
@@ -30,15 +29,14 @@ a native compiler. In either case, you've got a couple choices for configuring
 these options:
 
 1. Because these options are specified via C defines, you can pass most of these
-options to your compiler through command line compiler flags. Even if you're
-using an embedded target that forces you to use their overbearing IDE for all
-configuration, there will be a place somewhere in your project to configure
-defines for your compiler.
+   options to your compiler through command line compiler flags. Even if you're
+   using an embedded target that forces you to use their overbearing IDE for all
+   configuration, there will be a place somewhere in your project to configure
+   defines for your compiler.
 2. You can create a custom `unity_config.h` configuration file (present in your
-toolchain's search paths). In this file, you will list definitions and macros
-specific to your target. All you must do is define `UNITY_INCLUDE_CONFIG_H` and
-Unity will rely on `unity_config.h` for any further definitions it may need.
-
+   toolchain's search paths). In this file, you will list definitions and macros
+   specific to your target. All you must do is define `UNITY_INCLUDE_CONFIG_H` and
+   Unity will rely on `unity_config.h` for any further definitions it may need.
 
 ## The Options
 
@@ -54,7 +52,6 @@ certainly not every compiler you are likely to encounter. Therefore, Unity has a
 number of features for helping to adjust itself to match your required integer
 sizes. It starts off by trying to do it automatically.
 
-
 ##### `UNITY_EXCLUDE_STDINT_H`
 
 The first thing that Unity does to guess your types is check `stdint.h`.
@@ -66,8 +63,7 @@ That way, Unity will know to skip the inclusion of this file and you won't
 be left with a compiler error.
 
 _Example:_
-        #define UNITY_EXCLUDE_STDINT_H
-
+#define UNITY_EXCLUDE_STDINT_H
 
 ##### `UNITY_EXCLUDE_LIMITS_H`
 
@@ -76,14 +72,12 @@ that don't support `stdint.h` could include `limits.h` instead. If you don't
 want Unity to check this file either, define this to make it skip the inclusion.
 
 _Example:_
-        #define UNITY_EXCLUDE_LIMITS_H
-
+#define UNITY_EXCLUDE_LIMITS_H
 
 If you've disabled both of the automatic options above, you're going to have to
 do the configuration yourself. Don't worry. Even this isn't too bad... there are
 just a handful of defines that you are going to specify if you don't like the
 defaults.
-
 
 ##### `UNITY_INT_WIDTH`
 
@@ -91,8 +85,7 @@ Define this to be the number of bits an `int` takes up on your system. The
 default, if not autodetected, is 32 bits.
 
 _Example:_
-        #define UNITY_INT_WIDTH 16
-
+#define UNITY_INT_WIDTH 16
 
 ##### `UNITY_LONG_WIDTH`
 
@@ -103,8 +96,7 @@ of 64-bit support your system can handle. Does it need to specify a `long` or a
 ignored.
 
 _Example:_
-        #define UNITY_LONG_WIDTH 16
-
+#define UNITY_LONG_WIDTH 16
 
 ##### `UNITY_POINTER_WIDTH`
 
@@ -113,8 +105,7 @@ default, if not autodetected, is 32-bits. If you're getting ugly compiler
 warnings about casting from pointers, this is the one to look at.
 
 _Example:_
-        #define UNITY_POINTER_WIDTH 64
-
+#define UNITY_POINTER_WIDTH 64
 
 ##### `UNITY_SUPPORT_64`
 
@@ -125,8 +116,7 @@ can be a significant size and speed impact to enabling 64-bit support on small
 targets, so don't define it if you don't need it.
 
 _Example:_
-        #define UNITY_SUPPORT_64
-
+#define UNITY_SUPPORT_64
 
 ### Floating Point Types
 
@@ -136,7 +126,6 @@ single precision. We are able to guess integer sizes on the fly because integers
 are always available in at least one size. Floating point, on the other hand, is
 sometimes not available at all. Trying to include `float.h` on these platforms
 would result in an error. This leaves manual configuration as the only option.
-
 
 ##### `UNITY_INCLUDE_FLOAT`
 
@@ -158,7 +147,6 @@ _Example:_
         #define UNITY_EXCLUDE_FLOAT
         #define UNITY_INCLUDE_DOUBLE
 
-
 ##### `UNITY_EXCLUDE_FLOAT_PRINT`
 
 Unity aims for as small of a footprint as possible and avoids most standard
@@ -172,8 +160,7 @@ can use this define to instead respond to a failed assertion with a message like
 point assertions, use these options to give more explicit failure messages.
 
 _Example:_
-        #define UNITY_EXCLUDE_FLOAT_PRINT
-
+#define UNITY_EXCLUDE_FLOAT_PRINT
 
 ##### `UNITY_FLOAT_TYPE`
 
@@ -182,8 +169,7 @@ floats. If your compiler supports a specialty floating point type, you can
 always override this behavior by using this definition.
 
 _Example:_
-        #define UNITY_FLOAT_TYPE float16_t
-
+#define UNITY_FLOAT_TYPE float16_t
 
 ##### `UNITY_DOUBLE_TYPE`
 
@@ -194,8 +180,7 @@ could enable gargantuan floating point types on your 64-bit processor instead of
 the standard `double`.
 
 _Example:_
-        #define UNITY_DOUBLE_TYPE long double
-
+#define UNITY_DOUBLE_TYPE long double
 
 ##### `UNITY_FLOAT_PRECISION`
 
@@ -213,8 +198,7 @@ For further details on how this works, see the appendix of the Unity Assertion
 Guide.
 
 _Example:_
-        #define UNITY_FLOAT_PRECISION 0.001f
-
+#define UNITY_FLOAT_PRECISION 0.001f
 
 ### Toolset Customization
 
@@ -224,7 +208,6 @@ toolchain. It is possible that you may not need to touch any of these... but
 certain platforms, particularly those running in simulators, may need to jump
 through extra hoops to run properly. These macros will help in those
 situations.
-
 
 ##### `UNITY_OUTPUT_CHAR(a)`
 
@@ -248,17 +231,16 @@ _Example:_
 Say you are forced to run your test suite on an embedded processor with no
 `stdout` option. You decide to route your test result output to a custom serial
 `RS232_putc()` function you wrote like thus:
-        #include "RS232_header.h"
-        ...
-        #define UNITY_OUTPUT_CHAR(a) RS232_putc(a)
-        #define UNITY_OUTPUT_START() RS232_config(115200,1,8,0)
-        #define UNITY_OUTPUT_FLUSH() RS232_flush()
-        #define UNITY_OUTPUT_COMPLETE() RS232_close()
+#include "RS232_header.hpp"
+...
+#define UNITY_OUTPUT_CHAR(a) RS232_putc(a)
+#define UNITY_OUTPUT_START() RS232_config(115200,1,8,0)
+#define UNITY_OUTPUT_FLUSH() RS232_flush()
+#define UNITY_OUTPUT_COMPLETE() RS232_close()
 
 _Note:_
 `UNITY_OUTPUT_FLUSH()` can be set to the standard out flush function simply by
 specifying `UNITY_USE_FLUSH_STDOUT`. No other defines are required.
-
 
 ##### `UNITY_WEAK_ATTRIBUTE`
 
@@ -282,11 +264,10 @@ empty). You can also force Unity to NOT use weak functions by defining
 UNITY_NO_WEAK. The most common options for this feature are:
 
 _Example:_
-        #define UNITY_WEAK_ATTRIBUTE weak
-        #define UNITY_WEAK_ATTRIBUTE __attribute__((weak))
-        #define UNITY_WEAK_PRAGMA
-        #define UNITY_NO_WEAK
-
+#define UNITY_WEAK_ATTRIBUTE weak
+#define UNITY_WEAK_ATTRIBUTE **attribute**((weak))
+#define UNITY_WEAK_PRAGMA
+#define UNITY_NO_WEAK
 
 ##### `UNITY_PTR_ATTRIBUTE`
 
@@ -295,9 +276,8 @@ Some compilers require a custom attribute to be assigned to pointers, like
 defining this option with the attribute you would like.
 
 _Example:_
-        #define UNITY_PTR_ATTRIBUTE __attribute__((far))
-        #define UNITY_PTR_ATTRIBUTE near
-
+#define UNITY_PTR_ATTRIBUTE **attribute**((far))
+#define UNITY_PTR_ATTRIBUTE near
 
 ##### `UNITY_PRINT_EOL`
 
@@ -306,9 +286,7 @@ to parse by the scripts, by Ceedling, etc, but it might not be ideal for YOUR
 system. Feel free to override this and to make it whatever you wish.
 
 _Example:_
-        #define UNITY_PRINT_EOL { UNITY_OUTPUT_CHAR('\r'); UNITY_OUTPUT_CHAR('\n') }
-
-
+#define UNITY_PRINT_EOL { UNITY_OUTPUT_CHAR('\r'); UNITY_OUTPUT_CHAR('\n') }
 
 ##### `UNITY_EXCLUDE_DETAILS`
 
@@ -319,9 +297,7 @@ report which function or argument flagged an error. If you're not using CMock an
 you're not using these details for other things, then you can exclude them.
 
 _Example:_
-        #define UNITY_EXCLUDE_DETAILS
-
-
+#define UNITY_EXCLUDE_DETAILS
 
 ##### `UNITY_EXCLUDE_SETJMP`
 
@@ -333,16 +309,14 @@ compiler doesn't support setjmp, you wouldn't have had the memory space for thos
 things anyway, though... so this option exists for those situations.
 
 _Example:_
-        #define UNITY_EXCLUDE_SETJMP
+#define UNITY_EXCLUDE_SETJMP
 
 ##### `UNITY_OUTPUT_COLOR`
 
 If you want to add color using ANSI escape codes you can use this define.
 t
 _Example:_
-        #define UNITY_OUTPUT_COLOR
-
-
+#define UNITY_OUTPUT_COLOR
 
 ## Getting Into The Guts
 
@@ -355,7 +329,6 @@ must run your test suite on your target hardware, your Unity configuration will
 require special help. This special help will usually reside in one of two
 places: the `main()` function or the `RUN_TEST` macro. Let's look at how these
 work.
-
 
 ##### `main()`
 
@@ -386,7 +359,6 @@ It should be easy to see that you can add code before any test cases are run or
 after all the test cases have completed. This allows you to do any needed
 system-wide setup or teardown that might be required for your special
 circumstances.
-
 
 ##### `RUN_TEST`
 
@@ -422,12 +394,10 @@ each result set. Again, you could do this by adding lines to this macro. Updates
 to this macro are for the occasions when you need an action before or after
 every single test case throughout your entire suite of tests.
 
-
 ## Happy Porting
 
 The defines and macros in this guide should help you port Unity to just about
 any C target we can imagine. If you run into a snag or two, don't be afraid of
 asking for help on the forums. We love a good challenge!
 
-
-*Find The Latest of This And More at [ThrowTheSwitch.org](https://throwtheswitch.org)*
+_Find The Latest of This And More at [ThrowTheSwitch.org](https://throwtheswitch.org)_

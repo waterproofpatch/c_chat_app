@@ -21,7 +21,7 @@ describe "FffMockGenerator.create_mock_header" do
     end
     it "then the generated file includes the fff header" do
       expect(mock_header).to include(
-          %{#include "fff.h"\n})
+          %{#include "fff.hpp"\n})
     end
     it "then the generated file has a prototype for the init function" do
       expect(mock_header).to include(
@@ -281,8 +281,8 @@ describe "FffMockGenerator.create_mock_header" do
     }
     it "then they are included before the other files" do
       expect(mock_header).to include(
-        %{#include "another_header.h"\n} +
-        %{#include "fff.h"}
+        %{#include "another_header.hpp"\n} +
+        %{#include "fff.hpp"}
       )
     end
   end
@@ -295,8 +295,8 @@ describe "FffMockGenerator.create_mock_header" do
     }
     it "then they are included after the other files" do
       expect(mock_header).to include(
-        %{#include "display.h"\n} +
-        %{#include "another_header.h"\n}
+        %{#include "display.hpp"\n} +
+        %{#include "another_header.hpp"\n}
       )
     end
   end

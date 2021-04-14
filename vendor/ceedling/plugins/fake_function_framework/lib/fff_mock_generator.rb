@@ -45,8 +45,8 @@ class FffMockGenerator
   end
 
   def self.write_header_includes(module_name, output)
-    output.puts %{#include "fff.h"}
-    output.puts %{#include "fff_unity_helper.h"}
+    output.puts %{#include "fff.hpp"}
+    output.puts %{#include "fff_unity_helper.hpp"}
     output.puts %{#include "#{module_name}.h"}
   end
 
@@ -76,7 +76,7 @@ class FffMockGenerator
 
   def self.write_source_includes (mock_name, output)
     output.puts "#include <string.h>"
-    output.puts %{#include "fff.h"}
+    output.puts %{#include "fff.hpp"}
     output.puts %{#include "#{mock_name}.h"}
   end
 

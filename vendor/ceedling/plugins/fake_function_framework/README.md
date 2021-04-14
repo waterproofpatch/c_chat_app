@@ -34,8 +34,9 @@ In the `:plugins` configuration, add `fake_function_framework` to the list of en
     - module_generator
     - fake_function_framework
 ```
-*Note that you could put the plugin source in some other loaction.
-In that case you'd need to add a new path the `:load_paths`.*
+
+_Note that you could put the plugin source in some other loaction.
+In that case you'd need to add a new path the `:load_paths`._
 
 ## How to use it
 

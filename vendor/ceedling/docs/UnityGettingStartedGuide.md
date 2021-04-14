@@ -17,7 +17,6 @@ rules. Unity has been used with many compilers, including GCC, IAR, Clang,
 Green Hills, Microchip, and MS Visual Studio. It's not much work to get it to
 work with a new target.
 
-
 ### Overview of the Documents
 
 #### Unity Assertions reference
@@ -26,20 +25,17 @@ This document will guide you through all the assertion options provided by
 Unity. This is going to be your unit testing bread and butter. You'll spend more
 time with assertions than any other part of Unity.
 
-
 #### Unity Assertions Cheat Sheet
 
 This document contains an abridged summary of the assertions described in the
 previous document. It's perfect for printing and referencing while you
 familiarize yourself with Unity's options.
 
-
 #### Unity Configuration Guide
 
 This document is the one to reference when you are going to use Unity with a new
 target or compiler. It'll guide you through the configuration options and will
 help you customize your testing experience to meet your needs.
-
 
 #### Unity Helper Scripts
 
@@ -49,14 +45,12 @@ included in the auto directory of your Unity installation. Neither Ruby nor
 these scripts are necessary for using Unity. They are provided as a convenience
 for those who wish to use them.
 
-
 #### Unity License
 
 What's an open source project without a license file? This brief document
 describes the terms you're agreeing to when you use this software. Basically, we
 want it to be useful to you in whatever context you want to use it, but please
 don't blame us if you run into problems.
-
 
 ### Overview of the Folders
 
@@ -67,21 +61,20 @@ your life easier. You can ignore it or use it at your convenience. Here's an
 overview of everything in the project.
 
 - `src` - This is the code you care about! This folder contains a C file and two
-header files. These three files _are_ Unity.
+  header files. These three files _are_ Unity.
 - `docs` - You're reading this document, so it's possible you have found your way
-into this folder already. This is where all the handy documentation can be
-found.
+  into this folder already. This is where all the handy documentation can be
+  found.
 - `examples` - This contains a few examples of using Unity.
 - `extras` - These are optional add ons to Unity that are not part of the core
-project. If you've reached us through James Grenning's book, you're going to
-want to look here.
+  project. If you've reached us through James Grenning's book, you're going to
+  want to look here.
 - `test` - This is how Unity and its scripts are all tested. If you're just using
-Unity, you'll likely never need to go in here. If you are the lucky team member
-who gets to port Unity to a new toolchain, this is a good place to verify
-everything is configured properly.
+  Unity, you'll likely never need to go in here. If you are the lucky team member
+  who gets to port Unity to a new toolchain, this is a good place to verify
+  everything is configured properly.
 - `auto` - Here you will find helpful Ruby scripts for simplifying your test
-workflow. They are purely optional and are not required to make use of Unity.
-
+  workflow. They are purely optional and are not required to make use of Unity.
 
 ## How to Create A Test File
 
@@ -100,10 +93,10 @@ find setUp or tearDown when it links, you'll know you need to at least include
 an empty function for these.
 
 The majority of the file will be a series of test functions. Test functions
-follow the convention of starting with the word "test_" or "spec_". You don't HAVE
+follow the convention of starting with the word "test*" or "spec*". You don't HAVE
 to name them this way, but it makes it clear what functions are tests for other
-developers.  Also, the automated scripts that come with Unity or Ceedling will default
-to looking for test functions to be prefixed this way. Test functions take no arguments 
+developers. Also, the automated scripts that come with Unity or Ceedling will default
+to looking for test functions to be prefixed this way. Test functions take no arguments
 and return nothing. All test accounting is handled internally in Unity.
 
 Finally, at the bottom of your test file, you will write a `main()` function.
@@ -123,7 +116,7 @@ When you're done, your test file will look something like this:
 
 ```C
 #include "unity.h"
-#include "file_to_test.h"
+#include "file_to_test.hpp"
 
 void setUp(void) {
     // set stuff up here
@@ -153,7 +146,6 @@ It's possible that you will need more customization than this, eventually.
 For that sort of thing, you're going to want to look at the configuration guide.
 This should be enough to get you going, though.
 
-
 ## How to Build and Run A Test File
 
 This is the single biggest challenge to picking up a new unit testing framework,
@@ -166,6 +158,7 @@ You have two really good options for toolchains. Depending on where you're
 coming from, it might surprise you that neither of these options is running the
 unit tests on your hardware.
 There are many reasons for this, but here's a short version:
+
 - On hardware, you have too many constraints (processing power, memory, etc),
 - On hardware, you don't have complete control over all registers,
 - On hardware, unit testing is more challenging,
@@ -188,5 +181,4 @@ This flexibility of separating tests into individual executables allows us to
 much more thoroughly unit test our system and it keeps all the test code out of
 our final release!
 
-
-*Find The Latest of This And More at [ThrowTheSwitch.org](https://throwtheswitch.org)*
+_Find The Latest of This And More at [ThrowTheSwitch.org](https://throwtheswitch.org)_

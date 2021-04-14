@@ -13,7 +13,7 @@ describe "FffMockGenerator.create_mock_source" do
       expect(mock_source).to include(
         # fff.h also requires including string.h
         %{#include <string.h>\n} +
-        %{#include "fff.h"}
+        %{#include "fff.hpp"}
       )
     end
     it "then the generated file includes the mock header" do
@@ -127,7 +127,7 @@ describe "FffMockGenerator.create_mock_source" do
     }
     it "then they are included before the other files" do
       expect(mock_source).to include(
-        %{#include "another_header.h"\n} +
+        %{#include "another_header.hpp"\n} +
         %{#include <string.h>}
       )
     end
@@ -142,7 +142,7 @@ describe "FffMockGenerator.create_mock_source" do
     it "then they are included before the other files" do
       expect(mock_source).to include(
         %{#include "mock_display.h"\n} +
-        %{#include "another_header.h"\n}
+        %{#include "another_header.hpp"\n}
       )
     end
   end

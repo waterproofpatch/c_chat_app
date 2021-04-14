@@ -6,12 +6,12 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "event_processor.h"
-#include "display.h"
+#include "event_processor.hpp"
+#include "display.hpp"
 
 void event_deviceReset(void)
 {
-    //printf ("Device reset\n");
+    // printf ("Device reset\n");
     display_turnOffStatusLed();
 }
 

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "display.h"
+#include "display.hpp"
 
 void display_turnOffStatusLed(void)
 {

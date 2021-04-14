@@ -1,20 +1,19 @@
 #include "unity.h"
-#include "event_processor.h"
+#include "event_processor.hpp"
 #include "mock_display.h"
 #include <string.h>
 
-void setUp (void)
+void setUp(void)
 {
 }
 
-void tearDown (void)
+void tearDown(void)
 {
 }
 /*
     Test that a single function was called.
 */
-void
-test_whenTheDeviceIsReset_thenTheStatusLedIsTurnedOff()
+void test_whenTheDeviceIsReset_thenTheStatusLedIsTurnedOff()
 {
     // When
     event_deviceReset();
@@ -28,8 +27,7 @@ test_whenTheDeviceIsReset_thenTheStatusLedIsTurnedOff()
 /*
     Test that a single function is NOT called.
 */
-void
-test_whenThePowerReadingIsLessThan5_thenTheStatusLedIsNotTurnedOn(void)
+void test_whenThePowerReadingIsLessThan5_thenTheStatusLedIsNotTurnedOn(void)
 {
     // When
     event_powerReadingUpdate(4);
@@ -43,8 +41,7 @@ test_whenThePowerReadingIsLessThan5_thenTheStatusLedIsNotTurnedOn(void)
 /*
     Test that a single function was called with the correct arugment.
 */
-void
-test_whenTheVolumeKnobIsMaxed_thenVolumeDisplayIsSetTo11(void)
+void test_whenTheVolumeKnobIsMaxed_thenVolumeDisplayIsSetTo11(void)
 {
     // When
     event_volumeKnobMaxed();
@@ -60,8 +57,7 @@ test_whenTheVolumeKnobIsMaxed_thenVolumeDisplayIsSetTo11(void)
     Test a sequence of calls.
 */
 
-void
-test_whenTheModeSelectButtonIsPressed_thenTheDisplayModeIsCycled(void)
+void test_whenTheModeSelectButtonIsPressed_thenTheDisplayModeIsCycled(void)
 {
     // When
     event_modeSelectButtonPressed();
@@ -69,9 +65,12 @@ test_whenTheModeSelectButtonIsPressed_thenTheDisplayModeIsCycled(void)
     event_modeSelectButtonPressed();
 
     // Then
-    TEST_ASSERT_EQUAL_PTR((void *)display_setModeToMinimum, fff.call_history[0]);
-    TEST_ASSERT_EQUAL_PTR((void *)display_setModeToMaximum, fff.call_history[1]);
-    TEST_ASSERT_EQUAL_PTR((void *)display_setModeToAverage, fff.call_history[2]);
+    TEST_ASSERT_EQUAL_PTR((void *)display_setModeToMinimum,
+                          fff.call_history[0]);
+    TEST_ASSERT_EQUAL_PTR((void *)display_setModeToMaximum,
+                          fff.call_history[1]);
+    TEST_ASSERT_EQUAL_PTR((void *)display_setModeToAverage,
+                          fff.call_history[2]);
     // or use the helper macros...
     TEST_ASSERT_CALLED_IN_ORDER(0, display_setModeToMinimum);
     TEST_ASSERT_CALLED_IN_ORDER(1, display_setModeToMaximum);
@@ -81,8 +80,8 @@ test_whenTheModeSelectButtonIsPressed_thenTheDisplayModeIsCycled(void)
 /*
     Mock a return value from a function.
 */
-void
-test_givenTheDisplayHasAnError_whenTheDeviceIsPoweredOn_thenTheDisplayIsPoweredDown(void)
+void test_givenTheDisplayHasAnError_whenTheDeviceIsPoweredOn_thenTheDisplayIsPoweredDown(
+    void)
 {
     // Given
     display_isError_fake.return_val = true;
@@ -97,18 +96,18 @@ test_givenTheDisplayHasAnError_whenTheDeviceIsPoweredOn_thenTheDisplayIsPoweredD
 }
 
 /*
-	Mock a sequence of calls with return values.
+        Mock a sequence of calls with return values.
 */
 
 /*
     Mocking a function with a value returned by reference.
 */
-void
-test_givenTheUserHasTypedSleep_whenItIsTimeToCheckTheKeyboard_theDisplayIsPoweredDown(void)
+void test_givenTheUserHasTypedSleep_whenItIsTimeToCheckTheKeyboard_theDisplayIsPoweredDown(
+    void)
 {
     // Given
     char mockedEntry[] = "sleep";
-    void return_mock_value(char * entry, int length)
+    void return_mock_value(char *entry, int length)
     {
         if (length > strlen(mockedEntry))
         {
@@ -129,14 +128,14 @@ test_givenTheUserHasTypedSleep_whenItIsTimeToCheckTheKeyboard_theDisplayIsPowere
 /*
     Mock a function with a function pointer parameter.
 */
-void
-test_givenNewDataIsAvailable_whenTheDisplayHasUpdated_thenTheEventIsComplete(void)
+void test_givenNewDataIsAvailable_whenTheDisplayHasUpdated_thenTheEventIsComplete(
+    void)
 {
     // A mock function for capturing the callback handler function pointer.
-    void(*registeredCallback)(void) = 0;
-    void mock_display_updateData(int data, void(*callback)(void))
+    void (*registeredCallback)(void) = 0;
+    void mock_display_updateData(int data, void (*callback)(void))
     {
-        //Save the callback function.
+        // Save the callback function.
         registeredCallback = callback;
     }
     display_updateData_fake.custom_fake = mock_display_updateData;

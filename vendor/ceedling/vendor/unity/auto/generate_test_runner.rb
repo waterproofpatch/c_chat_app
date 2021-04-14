@@ -183,7 +183,7 @@ class UnityTestRunnerGenerator
     mocks.each do |mock|
       output.puts("#include \"#{mock.gsub('.h', '')}.h\"")
     end
-    output.puts('#include "CException.h"') if @options[:plugins].include?(:cexception)
+    output.puts('#include "CException.hpp"') if @options[:plugins].include?(:cexception)
 
     return unless @options[:enforce_strict_ordering]
 

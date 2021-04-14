@@ -24,7 +24,7 @@ class FakeFunctionFramework < Plugin
     File.open(arg_hash[:runner_file], 'a') do |f|
       f.puts
       f.puts "//=======Defintions of FFF variables====="
-      f.puts %{#include "fff.h"}
+      f.puts %{#include "fff.hpp"}
       f.puts "DEFINE_FFF_GLOBALS;"
     end
   end

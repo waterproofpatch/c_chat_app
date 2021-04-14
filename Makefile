@@ -5,8 +5,8 @@ BIN_SERVER=$(BIN)/server
 BIN_CLIENT=$(BIN)/client
 OUT_SERVER=$(BIN_SERVER)/server.bin
 OUT_CLIENT=$(BIN_CLIENT)/client.bin
-CLIENT_SRC=$(SRC)/client/*.c $(SRC)/shared/*.c $(SRC)/wrappers/*.c
-SERVER_SRC=$(SRC)/server/*.c $(SRC)/shared/*.c $(SRC)/wrappers/*.c
+CLIENT_SRC=$(SRC)/client/*.cpp $(SRC)/shared/*.cpp $(SRC)/wrappers/*.cpp
+SERVER_SRC=$(SRC)/server/*.cpp $(SRC)/shared/*.cpp $(SRC)/wrappers/*.cpp
 CFLAGS=-g2 -Wall -pthread
 LFLAGS=-L/usr/local/opt/openssl/lib -lcrypto -Wall -lssl
 
