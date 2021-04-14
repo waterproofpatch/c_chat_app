@@ -9,3 +9,4 @@ cert.csr
 .gitignore
 key.pem
 cert.pem
+test/unit/testRunner.bin
