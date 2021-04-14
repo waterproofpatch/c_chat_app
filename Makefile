@@ -1,5 +1,5 @@
 SRC = src
-INCLUDES=-I $(SRC)/shared -I $(SRC)/wrappers -I $(CPPUTEST_HOME)/include
+INCLUDES=-I $(SRC)/shared -I $(SRC)/wrappers 
 BIN=bin
 BIN_SERVER=$(BIN)/server
 BIN_CLIENT=$(BIN)/client
