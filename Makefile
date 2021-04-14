@@ -33,8 +33,8 @@ server:
 .PHONY: test
 test: unit integration
 
-unit: all
-	g++ test/unit/*.cpp -lCppUTest -lCppUTestExt -o test/unit/testRunner.bin $(INCLUDES) $(CLIENT_INCLUDES) $(SERVER_INCLUDES)
+unit: 
+	g++ test/unit/*.cpp $(SRC)/shared/*.cpp $(SRC)/wrappers/*.cpp $(LFLAGS) -lCppUTest -lCppUTestExt -o test/unit/testRunner.bin $(INCLUDES) $(CLIENT_INCLUDES) $(SERVER_INCLUDES)
 	./test/unit/testRunner.bin
 
 # run the pytests

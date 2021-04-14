@@ -1,7 +1,7 @@
 #include "CppUTest/TestHarness.h"
 
 // project includes
-#include "clientPrintCommands.hpp"
+#include "protoBroadcastMessage.hpp"
 
 // system includes
 #include <stdio.h>
@@ -22,7 +22,7 @@ TEST_GROUP(FirstTestGroup)
 
 TEST(FirstTestGroup, FirstTest)
 {
-    clientPrintCommands();
+    protoBroadcastMessage(NULL, NULL, 0, NULL, 0);
     FAIL("Fail me!");
 }
 
