@@ -1,5 +1,7 @@
 SRC = src
 INCLUDES=-I $(SRC)/shared -I $(SRC)/wrappers 
+CLIENT_INCLUDES=-I $(SRC)/client
+SERVER_INCLUDES=-I $(SRC)/server
 BIN=bin
 BIN_SERVER=$(BIN)/server
 BIN_CLIENT=$(BIN)/client
@@ -31,8 +33,8 @@ server:
 .PHONY: test
 test: unit integration
 
-unit:
-	g++ test/unit/*.cpp -lCppUTest -lCppUTestExt -o test/unit/testRunner.bin
+unit: all
+	g++ test/unit/*.cpp -lCppUTest -lCppUTestExt -o test/unit/testRunner.bin $(INCLUDES) $(CLIENT_INCLUDES) $(SERVER_INCLUDES)
 	./test/unit/testRunner.bin
 
 # run the pytests

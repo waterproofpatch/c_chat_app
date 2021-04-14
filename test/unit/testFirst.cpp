@@ -1,32 +1,32 @@
 #include "CppUTest/TestHarness.h"
 
-class A
-{
-   public:
-   private:
-};
+// project includes
+#include "clientPrintCommands.hpp"
 
-TEST_GROUP(A)
-{
-    A *className;
+// system includes
+#include <stdio.h>
 
-    void setup()
+// clang-format off
+TEST_GROUP(FirstTestGroup)
+{
+    TEST_SETUP()
     {
-        className = new A();
+        printf("Setting up...");
     }
-    void teardown()
+    TEST_TEARDOWN()
     {
-        delete className;
+        printf("Tearing down...");
     }
 };
+// clang-format on
 
-TEST(A, Create)
+TEST(FirstTestGroup, FirstTest)
 {
-    CHECK(0 != className);
-    CHECK(true);
-    CHECK_EQUAL(1, 1);
-    LONGS_EQUAL(1, 1);
-    DOUBLES_EQUAL(1.000, 1.001, .01);
-    STRCMP_EQUAL("hello", "hello");
-    // FAIL("The prior tests pass, but this one doesn't");
+    clientPrintCommands();
+    FAIL("Fail me!");
+}
+
+TEST(FirstTestGroup, SecondTest)
+{
+    FAIL("Fail me again!");
 }
