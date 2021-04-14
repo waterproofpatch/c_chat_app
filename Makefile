@@ -32,7 +32,6 @@ server:
 test: unit integration
 
 unit:
-	echo "Coming soon"
 	g++ test/unit/*.cpp -lCppUTest -lCppUTestExt -o test/unit/testRunner.bin
 	./test/unit/testRunner.bin
 
