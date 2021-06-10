@@ -38,8 +38,17 @@ server:
 .PHONY: test
 test: unit integration
 
-unit: 
-	g++ test/unit/client/*.cpp $(TEST_DEFINES) $(CLIENT_SRC) $(LFLAGS) -lCppUTest -lCppUTestExt -o $(CLIENT_TEST_BIN) $(INCLUDES) $(CLIENT_INCLUDES) 
+protoBroadcastMessage:
+	g++ -c src/shared/protoBroadcastMessage.cpp $(INCLUDES) -o protoBroadcastMessage.o
+
+protoSendCommand:
+	g++ -c src/shared/protoSendCommand.cpp $(INCLUDES) -o protoSendCommand.o
+
+wrappers:
+	g++ -c src/wrappers/wrappers.cpp $(INCLUDES) -o wrappers.o
+
+unit: protoBroadcastMessage protoSendCommand 
+	g++ test/unit/client/*.cpp $(TEST_DEFINES) protoSendCommand.o protoBroadcastMessage.o $(LFLAGS) -lCppUTest -lCppUTestExt -o $(CLIENT_TEST_BIN) $(INCLUDES) $(CLIENT_INCLUDES) 
 	g++ test/unit/server/*.cpp $(TEST_DEFINES) $(SERVER_SRC) $(LFLAGS) -lCppUTest -lCppUTestExt -o $(SERVER_TEST_BIN) $(INCLUDES) $(SERVER_INCLUDES)
 	./$(CLIENT_TEST_BIN)
 	./$(SERVER_TEST_BIN)
