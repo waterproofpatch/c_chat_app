@@ -18,7 +18,7 @@
 static user_t gUser;
 
 // clang-format off
-TEST_GROUP(FirstTestGroup)
+TEST_GROUP(TestGroup)
 {
     TEST_SETUP()
     {
@@ -67,7 +67,7 @@ proto_err_t protoSendCommand(user_t *       user,
     return OK;
 }
 
-TEST(FirstTestGroup, FirstTest)
+TEST(TestGroup, FirstTest)
 {
     mock().expectOneCall("wrappers_malloc");
     mock().expectOneCall("wrappers_free");
