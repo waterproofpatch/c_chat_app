@@ -1,6 +1,6 @@
 #include "CppUTest/TestHarness.h"
 
-// project includes
+// FUT
 #include "protoBroadcastMessage.hpp"
 
 // system includes
@@ -22,11 +22,7 @@ TEST_GROUP(FirstTestGroup)
 
 TEST(FirstTestGroup, FirstTest)
 {
-    protoBroadcastMessage(NULL, NULL, 0, NULL, 0);
-    FAIL("Fail me!");
-}
-
-TEST(FirstTestGroup, SecondTest)
-{
-    FAIL("Fail me again!");
+    proto_err_t res = protoBroadcastMessage(NULL, NULL, 0, NULL, 0);
+    LONGS_EQUAL(res, OK);
+    /* FAIL("Fail me!"); */
 }
