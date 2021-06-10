@@ -4,6 +4,9 @@
 // FUT
 #include "protoBroadcastMessage.hpp"
 
+// project libraries
+#include "types.hpp"   // command_type_t
+
 // system includes
 #include <stdio.h>
 #include <string.h>
@@ -44,11 +47,6 @@ void wrappers_free(void *p)
     free(p);
 }
 
-ssize_t wrappers_write(user_t *user, void *buf, size_t nbyte)
-{
-    mock().actualCall("wrappers_write");
-}
-
 void *wrappers_memcpy(void *dst, void *src, size_t n)
 {
     mock().actualCall("wrappers_memcpy");
@@ -60,14 +58,22 @@ void *wrappers_memset(void *b, int c, size_t len)
     mock().actualCall("wrappers_memset");
     return NULL;
 }
+proto_err_t protoSendCommand(user_t *       user,
+                             command_type_t cmd_type,
+                             const char *   payload,
+                             size_t         payload_length)
+{
+    mock().actualCall("protoSendCommand");
+    return OK;
+}
 
 TEST(FirstTestGroup, FirstTest)
 {
     mock().expectOneCall("wrappers_malloc");
     mock().expectOneCall("wrappers_free");
-    mock().expectOneCall("wrappers_write");
     mock().expectNCalls(2, "wrappers_memcpy");
     mock().expectNCalls(3, "wrappers_memset");
+    mock().expectOneCall("protoSendCommand");
 
     proto_err_t res = protoBroadcastMessage(&gUser, "name", 4, "message", 7);
 
