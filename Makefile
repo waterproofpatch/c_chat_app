@@ -1,4 +1,8 @@
 SRC = src
+OBJ_DIR := build
+SHARED_SRC_DIR=src/shared
+SRC_FILES := $(wildcard $(SHARED_SRC_DIR)/*.cpp)
+OBJ_FILES := $(patsubst $(SHARED_SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 INCLUDES=-I $(SRC)/shared -I $(SRC)/wrappers 
 CLIENT_INCLUDES=-I $(SRC)/client
 SERVER_INCLUDES=-I $(SRC)/server
@@ -38,14 +42,13 @@ server:
 .PHONY: test
 test: unit integration
 
-protoBroadcastMessage:
-	g++ -c src/shared/protoBroadcastMessage.cpp $(INCLUDES) -o protoBroadcastMessage.o
+$(OBJ_DIR)/%.o: $(SHARED_SRC_DIR)/%.cpp
+	mkdir -p build
+	g++ -c -o $@ $< $(INCLUDES)
 
-unit: protoBroadcastMessage 
-	g++ test/unit/client/*.cpp $(TEST_DEFINES) protoBroadcastMessage.o $(LFLAGS) -lCppUTest -lCppUTestExt -o $(CLIENT_TEST_BIN) $(INCLUDES) $(CLIENT_INCLUDES) 
-	g++ test/unit/server/*.cpp $(TEST_DEFINES) $(SERVER_SRC) $(LFLAGS) -lCppUTest -lCppUTestExt -o $(SERVER_TEST_BIN) $(INCLUDES) $(SERVER_INCLUDES)
+unit: $(OBJ_FILES) 
+	g++ test/unit/client/*.cpp $(TEST_DEFINES) $^ $(LFLAGS) -lCppUTest -lCppUTestExt -o $(CLIENT_TEST_BIN) $(INCLUDES) $(CLIENT_INCLUDES) 
 	./$(CLIENT_TEST_BIN)
-	./$(SERVER_TEST_BIN)
 
 # run the pytests
 integration:
